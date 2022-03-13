@@ -8,13 +8,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
 import me.timpushkin.sgbm_android.ui.elements.MenuButtons
 import me.timpushkin.sgbm_android.ui.theme.MainTheme
 import me.timpushkin.sgbm_android.utils.StorageUtils
+import me.timpushkin.sgbm_android.utils.depthArrayToBitmap
 import me.timpushkin.sgbm_android.utils.getDepthMap
 import me.timpushkin.sgbm_android.utils.loadCalibrationParams
-import me.timpushkin.sgbm_android.utils.depthMapToBitmap
+
+private const val WIDTH = 640
+private const val HEIGHT = 360
 
 class MainActivity : ComponentActivity() {
     private lateinit var mStorageUtils: StorageUtils
@@ -64,9 +68,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun processImageUris(leftUri: Uri, rightUri: Uri): ImageBitmap = mStorageUtils.run {
-        leftUri.useTempCopy { leftImage ->
-            rightUri.useTempCopy { rightImage ->
-                depthMapToBitmap(getDepthMap(leftImage.path, rightImage.path))
+        leftUri.useTempCopy { lImg ->
+            rightUri.useTempCopy { rImg ->
+                depthArrayToBitmap(
+                    getDepthMap(lImg.path, rImg.path, WIDTH, HEIGHT),
+                    WIDTH,
+                    HEIGHT
+                ).asImageBitmap()
             }
         }
     }
