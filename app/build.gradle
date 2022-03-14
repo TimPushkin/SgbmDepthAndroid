@@ -14,13 +14,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                cppFlags '-std=c++11 -frtti -fexceptions'
-                arguments '-DOpenCV_DIR=' + rootDir + '/' + opencvsdk + "/sdk/native/jni",
-                        '-DANDROID_ARM_NEON=TRUE'
-            }
-        }
     }
 
     buildTypes {
@@ -35,12 +28,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
-    }
-    externalNativeBuild {
-        cmake {
-            path file('src/main/cpp/CMakeLists.txt')
-            version '3.18.1'
-        }
     }
     buildFeatures {
         compose true
@@ -64,7 +51,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation 'androidx.activity:activity-compose:1.4.0'
 
-    implementation project(':opencv')
+    implementation project(':sgbm_android_lib')
 
     implementation("com.squareup.okio:okio:3.0.0")
     implementation("com.google.modernstorage:modernstorage-storage:1.0.0-alpha06")

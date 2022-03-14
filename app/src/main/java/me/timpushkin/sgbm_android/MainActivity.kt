@@ -14,21 +14,14 @@ import me.timpushkin.sgbm_android.ui.elements.MenuButtons
 import me.timpushkin.sgbm_android.ui.theme.MainTheme
 import me.timpushkin.sgbm_android.utils.StorageUtils
 import me.timpushkin.sgbm_android.utils.depthArrayToBitmap
-import me.timpushkin.sgbm_android.utils.getDepthMap
-import me.timpushkin.sgbm_android.utils.loadCalibrationParams
+import me.timpushkin.sgbm_android_lib.SgbmAndroidLib.getDepthMap
+import me.timpushkin.sgbm_android_lib.SgbmAndroidLib.loadCalibrationParams
 
 private const val WIDTH = 640
 private const val HEIGHT = 360
 
 class MainActivity : ComponentActivity() {
     private lateinit var mStorageUtils: StorageUtils
-
-    companion object {
-        init {
-            System.loadLibrary("opencv_java4")
-            System.loadLibrary("sgbm_android")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

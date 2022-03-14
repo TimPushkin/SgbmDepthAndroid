@@ -23,8 +23,8 @@ std::vector<T> matToVector(const cv::Mat &mat) {
 
 extern "C" {
 
-JNIEXPORT void JNICALL Java_me_timpushkin_sgbm_1android_utils_NativeKt_loadCalibrationParams(
-        JNIEnv *env, jclass, jstring filename) {
+JNIEXPORT void JNICALL Java_me_timpushkin_sgbm_1android_1lib_SgbmAndroidLib_loadCalibrationParams(
+        JNIEnv *env, jobject, jstring filename) {
     LOGI(TAG, "Loading calibration parameters...");
 
     cv::Mat leftMapX, leftMapY, rightMapX, rightMapY, Q;
@@ -49,8 +49,9 @@ JNIEXPORT void JNICALL Java_me_timpushkin_sgbm_1android_utils_NativeKt_loadCalib
     depthEstimator.loadCalibrationParams(leftMapX, leftMapY, rightMapX, rightMapY, Q);
 }
 
-JNIEXPORT jfloatArray JNICALL Java_me_timpushkin_sgbm_1android_utils_NativeKt_getDepthMap(
-        JNIEnv *env, jclass, jstring leftFilename, jstring rightFilename, jint width, jint height) {
+JNIEXPORT jfloatArray JNICALL Java_me_timpushkin_sgbm_1android_1lib_SgbmAndroidLib_getDepthMap(
+        JNIEnv *env, jobject, jstring leftFilename, jstring rightFilename, jint width,
+        jint height) {
     LOGI(TAG, "Getting depth map...");
 
     cv::Mat leftImage = cv::imread(env->GetStringUTFChars(leftFilename, nullptr)),

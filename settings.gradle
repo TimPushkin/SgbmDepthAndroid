@@ -15,5 +15,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "sgbm-android"
-include ':app', ':opencv'
+include ':app', ':sgbm_android_lib', ':opencv'
 project(':opencv').projectDir = new File(opencvsdk + '/sdk')
