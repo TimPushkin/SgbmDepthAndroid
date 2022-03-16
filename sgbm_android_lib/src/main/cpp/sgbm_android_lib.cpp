@@ -1,8 +1,6 @@
 #include <jni.h>
 #include "logging.h"
 #include "depth_estimator.h"
-#include <jni.h>
-#include <jni.h>
 
 #define TAG "n_sgbm_android_lib"
 
@@ -15,6 +13,13 @@
 static DepthEstimator depthEstimator;
 
 // TODO: move to a separate file (linkage problems may arise)
+
+char *jbyteArrayToChars(JNIEnv *env, jbyteArray &jarray) {
+    size_t len = env->GetArrayLength(jarray);
+    char *str = new char[len];
+    env->GetByteArrayRegion(jarray, 0, len, reinterpret_cast<jbyte *>(str));
+    return str;
+}
 
 template<class T>
 std::vector<T> jbyteArrayToVector(JNIEnv *env, jbyteArray &jarray) {
@@ -35,27 +40,25 @@ std::vector<T> matToVector(const cv::Mat &mat) {
 extern "C" {
 
 JNIEXPORT void JNICALL Java_me_timpushkin_sgbm_1android_1lib_SgbmAndroidLib_loadCalibrationParams(
-        JNIEnv *env, jobject, jstring filename) {
+        JNIEnv *env, jobject, jbyteArray jcontent) {
     LOGI(TAG, "Loading calibration parameters...");
 
     cv::Mat leftMapX, leftMapY, rightMapX, rightMapY, Q;
-    std::string filenameStr = env->GetStringUTFChars(filename, nullptr);
+    char *content = jbyteArrayToChars(env, jcontent);
 
-    LOGD(TAG, "Opening %s for reading", filenameStr.c_str());
+    cv::FileStorage fs(content, cv::FileStorage::READ + cv::FileStorage::MEMORY);
 
-    cv::FileStorage file(filenameStr, cv::FileStorage::Mode::READ);
-
-    if (!file.isOpened()) {
-        LOGE(TAG, "Failed to open %s for reading", filenameStr.c_str());
+    if (!fs.isOpened()) {
+        LOGE(TAG, "Failed to read the received content");
         // TODO: raise an exception
         return;
     }
 
-    file[LEFT_MAP_X_NAME] >> leftMapX;
-    file[LEFT_MAP_Y_NAME] >> leftMapY;
-    file[RIGHT_MAP_X_NAME] >> rightMapX;
-    file[RIGHT_MAP_Y_NAME] >> rightMapY;
-    file[Q_NAME] >> Q;
+    fs[LEFT_MAP_X_NAME] >> leftMapX;
+    fs[LEFT_MAP_Y_NAME] >> leftMapY;
+    fs[RIGHT_MAP_X_NAME] >> rightMapX;
+    fs[RIGHT_MAP_Y_NAME] >> rightMapY;
+    fs[Q_NAME] >> Q;
 
     depthEstimator.loadCalibrationParams(leftMapX, leftMapY, rightMapX, rightMapY, Q);
 }
@@ -65,10 +68,8 @@ JNIEXPORT jfloatArray JNICALL Java_me_timpushkin_sgbm_1android_1lib_SgbmAndroidL
         jint height) {
     LOGI(TAG, "Getting depth map...");
 
-    cv::Mat leftImage = cv::imdecode(jbyteArrayToVector<char>(env, jleftImage),
-                                     cv::ImreadModes::IMREAD_COLOR),
-            rightImage = cv::imdecode(jbyteArrayToVector<char>(env, jrightImage),
-                                      cv::ImreadModes::IMREAD_COLOR);
+    cv::Mat leftImage = cv::imdecode(jbyteArrayToVector<char>(env, jleftImage), cv::IMREAD_COLOR),
+            rightImage = cv::imdecode(jbyteArrayToVector<char>(env, jrightImage), cv::IMREAD_COLOR);
 
     LOGD(TAG, "Loaded images:\n"
               "- Left image has size %i x %i\n"

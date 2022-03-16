@@ -5,7 +5,7 @@ object SgbmAndroidLib {
         System.loadLibrary("sgbm_android_lib")
     }
 
-    external fun loadCalibrationParams(filename: String)
+    external fun loadCalibrationParams(content: ByteArray)
 
     external fun getDepthMap(
         leftImage: ByteArray,
