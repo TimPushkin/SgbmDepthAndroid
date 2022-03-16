@@ -8,8 +8,8 @@ object SgbmAndroidLib {
     external fun loadCalibrationParams(filename: String)
 
     external fun getDepthMap(
-        leftFilename: String,
-        rightFilename: String,
+        leftImage: ByteArray,
+        rightImage: ByteArray,
         width: Int,
         height: Int
     ): FloatArray

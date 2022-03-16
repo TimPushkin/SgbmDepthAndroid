@@ -60,15 +60,14 @@ class MainActivity : ComponentActivity() {
         mStorageUtils.run { uri.useTempCopy(".xml") { loadCalibrationParams(it.path) } }
     }
 
-    private fun processImageUris(leftUri: Uri, rightUri: Uri): ImageBitmap = mStorageUtils.run {
-        leftUri.useTempCopy { lImg ->
-            rightUri.useTempCopy { rImg ->
+    private fun processImageUris(leftUri: Uri, rightUri: Uri): ImageBitmap =
+        contentResolver.openInputStream(leftUri)?.use { leftStream ->
+            contentResolver.openInputStream(rightUri)?.use { rightStream ->
                 depthArrayToBitmap(
-                    getDepthMap(lImg.path, rImg.path, WIDTH, HEIGHT),
+                    getDepthMap(leftStream.readBytes(), rightStream.readBytes(), WIDTH, HEIGHT),
                     WIDTH,
                     HEIGHT
                 ).asImageBitmap()
             }
-        }
-    }
+        } ?: ImageBitmap(WIDTH, HEIGHT)
 }

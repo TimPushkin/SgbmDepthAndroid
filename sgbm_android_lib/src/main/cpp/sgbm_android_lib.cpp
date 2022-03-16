@@ -1,6 +1,8 @@
 #include <jni.h>
 #include "logging.h"
 #include "depth_estimator.h"
+#include <jni.h>
+#include <jni.h>
 
 #define TAG "n_sgbm_android_lib"
 
@@ -13,6 +15,15 @@
 static DepthEstimator depthEstimator;
 
 // TODO: move to a separate file (linkage problems may arise)
+
+template<class T>
+std::vector<T> jbyteArrayToVector(JNIEnv *env, jbyteArray &jarray) {
+    size_t len = env->GetArrayLength(jarray);
+    std::vector<T> vec(len);
+    env->GetByteArrayRegion(jarray, 0, len, reinterpret_cast<jbyte *>(vec.data()));
+    return vec;
+}
+
 template<class T>
 std::vector<T> matToVector(const cv::Mat &mat) {
     std::vector<T> result;
@@ -50,12 +61,14 @@ JNIEXPORT void JNICALL Java_me_timpushkin_sgbm_1android_1lib_SgbmAndroidLib_load
 }
 
 JNIEXPORT jfloatArray JNICALL Java_me_timpushkin_sgbm_1android_1lib_SgbmAndroidLib_getDepthMap(
-        JNIEnv *env, jobject, jstring leftFilename, jstring rightFilename, jint width,
+        JNIEnv *env, jobject, jbyteArray jleftImage, jbyteArray jrightImage, jint width,
         jint height) {
     LOGI(TAG, "Getting depth map...");
 
-    cv::Mat leftImage = cv::imread(env->GetStringUTFChars(leftFilename, nullptr)),
-            rightImage = cv::imread(env->GetStringUTFChars(rightFilename, nullptr));
+    cv::Mat leftImage = cv::imdecode(jbyteArrayToVector<char>(env, jleftImage),
+                                     cv::ImreadModes::IMREAD_COLOR),
+            rightImage = cv::imdecode(jbyteArrayToVector<char>(env, jrightImage),
+                                      cv::ImreadModes::IMREAD_COLOR);
 
     LOGD(TAG, "Loaded images:\n"
               "- Left image has size %i x %i\n"
