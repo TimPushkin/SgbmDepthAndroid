@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <opencv2/imgcodecs.hpp>
 #include "logging.h"
 #include "depth_estimator.h"
 

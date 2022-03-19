@@ -3,7 +3,6 @@
 
 #include <opencv2/calib3d.hpp>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
 
 class DepthEstimator {
     std::pair<cv::Mat, cv::Mat> mLeftMap, mRightMap;
