@@ -1,19 +1,30 @@
 package me.timpushkin.sgbm_android.utils
 
 import android.graphics.Bitmap
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import org.opencv.android.Utils
-import org.opencv.core.Core
-import org.opencv.core.CvType
-import org.opencv.core.Mat
+import android.util.Log
+import java.nio.IntBuffer
 
-fun depthMapToBitmap(matAddr: Long): ImageBitmap {
-    val mat = Mat()
-    Core.normalize(Mat(matAddr), mat, 0.0, 255.0, Core.NORM_MINMAX, CvType.CV_8UC1)
+private const val TAG = "Conversions"
 
-    val bitmap = mat.run { Bitmap.createBitmap(cols(), rows(), Bitmap.Config.ARGB_8888) }
-    Utils.matToBitmap(mat, bitmap)
+private const val MAX_COLOR = 0xff
 
-    return bitmap.asImageBitmap()
+fun depthArrayToBitmap(depthArray: FloatArray, width: Int, height: Int): Bitmap {
+    Log.i(
+        TAG,
+        "Converting depth array of size ${depthArray.size} to a Bitmap of size $width x $height = ${width * height}"
+    )
+
+    val max = depthArray.maxOfOrNull { it }?.coerceAtLeast(Float.MIN_VALUE) ?: Float.MIN_VALUE
+    val buffer = IntBuffer.allocate(depthArray.size).apply {
+        val alpha = MAX_COLOR shl 24
+        depthArray.forEach { depth ->
+            val normalized = (depth.coerceAtLeast(0f) / max * MAX_COLOR).toInt()
+            put(alpha or (normalized shl 16) or (normalized shl 8) or normalized)
+        }
+        rewind()
+    }
+
+    return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).apply {
+        copyPixelsFromBuffer(buffer)
+    }
 }

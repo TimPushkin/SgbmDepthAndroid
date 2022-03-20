@@ -8,28 +8,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
 import me.timpushkin.sgbm_android.ui.elements.MenuButtons
 import me.timpushkin.sgbm_android.ui.theme.MainTheme
-import me.timpushkin.sgbm_android.utils.StorageUtils
-import me.timpushkin.sgbm_android.utils.getDepthMap
-import me.timpushkin.sgbm_android.utils.loadCalibrationParams
-import me.timpushkin.sgbm_android.utils.depthMapToBitmap
+import me.timpushkin.sgbm_android.utils.depthArrayToBitmap
+import me.timpushkin.sgbm_android_lib.SgbmAndroidLib.getDepthMap
+import me.timpushkin.sgbm_android_lib.SgbmAndroidLib.loadCalibrationParams
+
+private const val WIDTH = 640
+private const val HEIGHT = 360
 
 class MainActivity : ComponentActivity() {
-    private lateinit var mStorageUtils: StorageUtils
-
-    companion object {
-        init {
-            System.loadLibrary("opencv_java4")
-            System.loadLibrary("sgbm_android")
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        mStorageUtils = StorageUtils(this)
 
         setContent {
             MainTheme {
@@ -40,10 +32,15 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     bottomBar = {
+                        fun displayError(message: String) =
+                            scope.launch { scaffoldState.snackbarHostState.showSnackbar(message) }
+
                         MenuButtons(
-                            this::processParamsUri,
-                            { left, right -> depthMap = processImageUris(left, right) },
-                            { msg -> scope.launch { scaffoldState.snackbarHostState.showSnackbar(msg) } }
+                            { uri -> processParamsUri(uri, ::displayError) },
+                            { left, right ->
+                                depthMap = processImageUris(left, right, ::displayError)
+                            },
+                            ::displayError
                         )
                     },
                     backgroundColor = MaterialTheme.colors.background
@@ -59,15 +56,32 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun processParamsUri(uri: Uri) {
-        mStorageUtils.run { uri.useTempCopy(".xml") { loadCalibrationParams(it.path) } }
+    private fun processParamsUri(uri: Uri, onError: (String) -> Unit) {
+        val inputStream = contentResolver.openInputStream(uri)
+        if (inputStream == null) {
+            onError("Cannot open calibration parameters")
+            return
+        }
+
+        val params = inputStream.use { it.readBytes() }
+        loadCalibrationParams(params)
     }
 
-    private fun processImageUris(leftUri: Uri, rightUri: Uri): ImageBitmap = mStorageUtils.run {
-        leftUri.useTempCopy { leftImage ->
-            rightUri.useTempCopy { rightImage ->
-                depthMapToBitmap(getDepthMap(leftImage.path, rightImage.path))
+    private fun processImageUris(
+        leftUri: Uri,
+        rightUri: Uri,
+        onError: (String) -> Unit
+    ): ImageBitmap =
+        contentResolver.openInputStream(leftUri)?.use { leftStream ->
+            contentResolver.openInputStream(rightUri)?.use { rightStream ->
+                depthArrayToBitmap(
+                    getDepthMap(leftStream.readBytes(), rightStream.readBytes(), WIDTH, HEIGHT),
+                    WIDTH,
+                    HEIGHT
+                ).asImageBitmap()
             }
+        } ?: run {
+            onError("Images processing failed")
+            ImageBitmap(WIDTH, HEIGHT)
         }
-    }
 }
