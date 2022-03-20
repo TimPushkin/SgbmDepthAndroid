@@ -57,10 +57,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun processParamsUri(uri: Uri, onError: (String) -> Unit) {
-        val params = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: run {
-            onError("Calibration parameters processing failed")
+        val inputStream = contentResolver.openInputStream(uri)
+        if (inputStream == null) {
+            onError("Cannot open calibration parameters")
             return
         }
+
+        val params = inputStream.use { it.readBytes() }
         loadCalibrationParams(params)
     }
 
