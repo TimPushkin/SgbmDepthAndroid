@@ -3,15 +3,20 @@
 
 #define TAG "DepthEstimator"
 
-void DepthEstimator::loadCalibrationParams(cv::Mat leftMapX, cv::Mat leftMapY, cv::Mat rightMapX,
-                                           cv::Mat rightMapY, cv::Mat Q) {
+DepthEstimator::DepthEstimator(const cv::Mat &leftMapX, const cv::Mat &leftMapY, const cv::Mat &rightMapX,
+                               const cv::Mat &rightMapY, const cv::Mat &Q) {
+    loadCalibrationParams(leftMapX, leftMapY, rightMapX, rightMapY, Q);
+}
+
+void DepthEstimator::loadCalibrationParams(const cv::Mat &leftMapX, const cv::Mat &leftMapY, const cv::Mat &rightMapX,
+                                           const cv::Mat &rightMapY, const cv::Mat &Q) {
     LOGI(TAG, "Loading calibration parameters...");
 
-    mLeftMap.first = std::move(leftMapX);
-    mLeftMap.second = std::move(leftMapY);
-    mRightMap.first = std::move(rightMapX);
-    mRightMap.second = std::move(rightMapY);
-    mQ = std::move(Q);
+    mLeftMap.first = leftMapX;
+    mLeftMap.second = leftMapY;
+    mRightMap.first = rightMapX;
+    mRightMap.second = rightMapY;
+    mQ = Q;
 
     LOGD(TAG, "Loaded calibration parameters:\n"
               "- LeftMapX has size %i x %i\n"
@@ -67,7 +72,6 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
 
     cv::Mat image3d, depthMap;
 
-    // TODO: check that Q has been loaded
     cv::reprojectImageTo3D(disparity, image3d, mQ);
 
     depthMap.create(image3d.size(), CV_32FC1);
@@ -84,7 +88,6 @@ void DepthEstimator::calcDepth(cv::InputArray leftImage, cv::InputArray rightIma
 
     cv::Mat leftImage_, rightImage_, depthMap;
 
-    // TODO: check that the maps have been loaded
     cv::remap(leftImage, leftImage_, mLeftMap.first, mLeftMap.second, cv::INTER_LINEAR);
     cv::remap(rightImage, rightImage_, mRightMap.first, mRightMap.second, cv::INTER_LINEAR);
 

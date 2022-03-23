@@ -15,8 +15,11 @@ class DepthEstimator {
     void getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst, float maxDepth = 10);
 
 public:
-    void loadCalibrationParams(cv::Mat leftMapX, cv::Mat leftMapY, cv::Mat rightMapX,
-                               cv::Mat rightMapY, cv::Mat Q);
+    DepthEstimator(const cv::Mat &leftMapX, const cv::Mat &leftMapY, const cv::Mat &rightMapX,
+                   const cv::Mat &rightMapY, const cv::Mat &Q);
+
+    void loadCalibrationParams(const cv::Mat &leftMapX, const cv::Mat &leftMapY, const cv::Mat &rightMapX,
+                               const cv::Mat &rightMapY, const cv::Mat &Q);
 
     void calcDepth(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst,
                    cv::Size imageSize = cv::Size(640, 360));
