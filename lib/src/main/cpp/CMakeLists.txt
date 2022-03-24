@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project("sgbm_android_core")
 
-set(SOURCE_FILES depth_estimator.cpp)
+set(SOURCE_FILES depth_estimator.cpp conversions.cpp conversions.h)
 set(OPENCV_INSTALL_DIR ${CMAKE_BINARY_DIR}/opencv-install)
 
 include(ExternalProject)
@@ -27,13 +27,13 @@ ExternalProject_Add(opencv
         -DWITH_OPENVX=ON # TODO: use OPENVX_ROOT
         -DWITH_EIGEN=ON # TODO: use EIGEN_INCLUDE_PATH
         -DWITH_IPP=ON
-        -DBUILD_LIST=calib3d,imgproc,flann
+        -DBUILD_LIST=calib3d,imgproc,imgcodecs,flann
         # -DCPU_BASELINE=NEON TODO: check the current platform and act accordingly
         -DCMAKE_INSTALL_PREFIX=${OPENCV_INSTALL_DIR}
         )
 include_directories(${OPENCV_INSTALL_DIR}/include/opencv4)
 link_directories(${OPENCV_INSTALL_DIR}/lib)
-set(OPENCV_LIBRARIES opencv_calib3d opencv_imgproc)
+set(OPENCV_LIBRARIES opencv_calib3d opencv_imgproc opencv_imgcodecs opencv_flann)
 
 add_library(sgbm_android_core SHARED ${SOURCE_FILES})
 
