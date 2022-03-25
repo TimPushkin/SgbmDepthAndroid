@@ -141,17 +141,17 @@ std::vector<float> DepthEstimator::calcDepth(const std::vector<char> &leftImageE
                                              const std::vector<char> &rightImageEncoded, int width, int height) {
     LOGI(TAG, "Converting `char *` images into OpenCV classes...");
 
-    cv::Mat leftImage = cv::imdecode(leftImage, cv::IMREAD_COLOR),
-            rightImage = cv::imdecode(rightImage, cv::IMREAD_COLOR),
+    cv::Mat leftImage = cv::imdecode(leftImageEncoded, cv::IMREAD_COLOR),
+            rightImage = cv::imdecode(rightImageEncoded, cv::IMREAD_COLOR),
             depthMap;
 
     LOGD(TAG, "Loaded images:\n"
               "- Left image has size %i x %i\n"
               "- Right image has size %i x %i\n",
-         leftImageEncoded.cols, leftImageEncoded.rows,
-         rightImageEncoded.cols, rightImageEncoded.rows);
+         leftImage.cols, leftImage.rows,
+         rightImage.cols, rightImage.rows);
 
-    calcDepth(leftImageEncoded, rightImageEncoded, depthMap, cv::Size(width, height));
+    calcDepth(leftImage, rightImage, depthMap, cv::Size(width, height));
 
     return matToVector<float>(depthMap);
 }

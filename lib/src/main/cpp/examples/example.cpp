@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../include/depth_estimator.h"
 
+// The example is expected to be run from the same directory this file is in
 #define CALIB R"(images/calib_params.xml)"
 #define L_IMG R"(images/clothes_l.png)"
 #define R_IMG R"(images/clothes_r.png)"
