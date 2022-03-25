@@ -1,8 +1,12 @@
+project("sgbm_android_core")
+
 set(SOURCE_FILES depth_estimator.cpp conversions.cpp)
 set(OPENCV_INSTALL_DIR ${CMAKE_BINARY_DIR}/opencv-install)
 set(OPENCV_LIBRARIES opencv_calib3d opencv_imgproc opencv_imgcodecs opencv_flann)
 
-add_library(sgbm_android_core SHARED ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 include(ExternalProject)
 ExternalProject_Add(opencv
@@ -30,9 +34,9 @@ ExternalProject_Add(opencv
         # -DCPU_BASELINE=NEON TODO: check the current platform and act accordingly
         -DCMAKE_INSTALL_PREFIX=${OPENCV_INSTALL_DIR}
         )
-target_include_directories(sgbm_android_core PUBLIC ${OPENCV_INSTALL_DIR}/include/opencv4)
-target_link_directories(sgbm_android_core PUBLIC ${OPENCV_INSTALL_DIR}/lib)
-add_dependencies(sgbm_android_core opencv)
+target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/include/opencv4)
+target_link_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/lib)
+add_dependencies(${PROJECT_NAME} opencv)
 
 if (ANDROID)
     find_library(log-lib log)
@@ -40,4 +44,4 @@ else()
     set(log-lib "")
 endif()
 
-target_link_libraries(sgbm_android_core PUBLIC ${log-lib} ${OPENCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${log-lib} ${OPENCV_LIBRARIES})

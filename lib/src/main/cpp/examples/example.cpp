@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include "../core/depth_estimator.h"
+#include "../include/depth_estimator.h"
 
 #define CALIB R"(images/calib_params.xml)"
 #define L_IMG R"(images/clothes_l.png)"

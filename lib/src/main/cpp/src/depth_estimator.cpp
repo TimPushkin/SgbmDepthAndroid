@@ -1,7 +1,7 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
-#include "depth_estimator.h"
+#include "../include/depth_estimator.h"
 #include "conversions.h"
 #include "logging.h"
 

@@ -1,3 +1,5 @@
-add_executable(example example.cpp)
+project("examples")
 
-target_link_libraries(example sgbm_android_core)
+add_executable(${PROJECT_NAME} example.cpp)
+
+target_link_libraries(${PROJECT_NAME} sgbm_android_core)
