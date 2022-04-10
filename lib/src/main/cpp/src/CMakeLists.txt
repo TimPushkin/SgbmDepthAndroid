@@ -1,6 +1,6 @@
 project("sgbm_android_core")
 
-set(SOURCE_FILES depth_estimator.cpp)
+set(SOURCE_FILES DepthEstimator.cpp)
 set(OPENCV_INSTALL_DIR ${CMAKE_BINARY_DIR}/opencv-install)
 set(OPENCV_PUBLIC_LIBRARIES opencv_core)
 set(OPENCV_PRIVATE_LIBRARIES ${OPENCV_PUBLIC_LIBRARIES} opencv_calib3d opencv_imgproc opencv_imgcodecs opencv_flann)

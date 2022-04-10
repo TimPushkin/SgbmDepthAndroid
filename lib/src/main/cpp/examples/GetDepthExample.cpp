@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include "../include/depth_estimator.h"
+#include "../include/DepthEstimator.h"
 
 const int kCliArgsNum = 4;
 
