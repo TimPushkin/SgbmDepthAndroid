@@ -11,15 +11,16 @@ DepthEstimator::DepthEstimator(const char *content) {
     loadCalibrationParams(content);
 }
 
-void DepthEstimator::loadCalibrationParams(const char *content) {
+void DepthEstimator::loadCalibrationParams(const char *content, const std::string &leftMapXName,
+                                           const std::string &leftMapYName, const std::string &rightMapXName,
+                                           const std::string &rightMapYName, const std::string &qName) {
     LOGI(TAG, "Loading calibration parameters from file contents...");
 
     cv::FileStorage fs(content, cv::FileStorage::READ + cv::FileStorage::MEMORY);
 
     if (!fs.isOpened()) {
         LOGE(TAG, "Failed to read the received content");
-        // TODO: raise an exception
-        return;
+        throw std::invalid_argument("Illegal content format");
     }
 
     fs[leftMapXName] >> mLeftMap.first;
@@ -41,14 +42,11 @@ void DepthEstimator::loadCalibrationParams(const char *content) {
          mQ.cols, mQ.rows);
 }
 
-void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage,
-                                  cv::OutputArray dst, int minDisparity, int maxDisparity,
-                                  int blockSize) {
+void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
     LOGI(TAG, "Computing disparity...");
 
     cv::Mat leftImageGray, rightImageGray;
 
-    // TODO: remove consts
     int numDisparities = maxDisparity - minDisparity,
             P1 = 8 * 3 * blockSize * blockSize,
             P2 = 32 * 3 * blockSize * blockSize,
@@ -76,7 +74,7 @@ void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray right
     sgbm->compute(leftImageGray, rightImageGray, dst);
 }
 
-void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst, float maxDepth) {
+void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const {
     LOGI(TAG, "Getting depth from disparity...");
 
     cv::Mat image3d, depthMap;
@@ -92,7 +90,7 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
 }
 
 std::vector<float> DepthEstimator::calcDepth(const std::vector<char> &leftImageEncoded,
-                                             const std::vector<char> &rightImageEncoded, int width, int height) {
+                                             const std::vector<char> &rightImageEncoded, int width, int height) const {
     cv::Mat leftImage, rightImage, depthMap;
     cv::Size imageSize(width, height);
 
@@ -113,11 +111,20 @@ std::vector<float> DepthEstimator::calcDepth(const std::vector<char> &leftImageE
     cv::resize(leftImage, leftImage, imageSize);
     cv::resize(rightImage, rightImage, imageSize);
 
-    // TODO: remove consts
-    getDisparity(leftImage, rightImage, depthMap, 0, 112, 3);
-    getDepthFromDisparity(depthMap / 16.0, depthMap);
+    getDisparity(leftImage, rightImage, depthMap);
+    getDepthFromDisparity(depthMap * disparityCorrectionFactor, depthMap);
 
     LOGI(TAG, "Depth calculation finished");
 
     return matToVector<float>(depthMap);
 }
+
+void DepthEstimator::setMinDisparity(int value) { minDisparity = value; }
+
+void DepthEstimator::setMaxDisparity(int value) { maxDisparity = value; }
+
+void DepthEstimator::setBlockSize(int value) { blockSize = value; }
+
+void DepthEstimator::setDisparityCorrectionFactor(float value) { disparityCorrectionFactor = value; }
+
+void DepthEstimator::setMaxDepth(float value) { maxDepth = value; }
