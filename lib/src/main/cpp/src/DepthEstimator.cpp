@@ -7,27 +7,23 @@
 
 #define TAG "DepthEstimator"
 
-DepthEstimator::DepthEstimator(const char *content) {
-    loadCalibrationParams(content);
-}
+DepthEstimator::DepthEstimator(const std::string &calibPath) {
+    // TODO: call calibrate
 
-void DepthEstimator::loadCalibrationParams(const char *content, const std::string &leftMapXName,
-                                           const std::string &leftMapYName, const std::string &rightMapXName,
-                                           const std::string &rightMapYName, const std::string &qName) {
-    LOGI(TAG, "Loading calibration parameters from file contents...");
+    LOGI(TAG, "Loading calibration parameters from %s...", calibPath);
 
-    cv::FileStorage fs(content, cv::FileStorage::READ + cv::FileStorage::MEMORY);
+    cv::FileStorage fs(calibPath, cv::FileStorage::READ);
 
     if (!fs.isOpened()) {
-        LOGE(TAG, "Failed to read the received content");
-        throw std::invalid_argument("Illegal content format");
+        LOGE(TAG, "Failed to read calibration parameters from the received file");
+        throw std::invalid_argument("Illegal calibration file format");
     }
 
-    fs[leftMapXName] >> mLeftMap.first;
-    fs[leftMapYName] >> mLeftMap.second;
-    fs[rightMapXName] >> mRightMap.first;
-    fs[rightMapYName] >> mRightMap.second;
-    fs[qName] >> mQ;
+    fs["leftMapX"] >> mLeftMap.first;
+    fs["leftMapY"] >> mLeftMap.second;
+    fs["rightMapX"] >> mRightMap.first;
+    fs["rightMapY"] >> mRightMap.second;
+    fs["Q"] >> mQ;
 
     LOGD(TAG, "Loaded calibration parameters:\n"
               "- LeftMapX has size %i x %i\n"
@@ -40,6 +36,11 @@ void DepthEstimator::loadCalibrationParams(const char *content, const std::strin
          mRightMap.first.cols, mRightMap.first.rows,
          mRightMap.second.cols, mRightMap.second.rows,
          mQ.cols, mQ.rows);
+}
+
+bool DepthEstimator::calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage) {
+    // TODO: fill calibration parameters
+    return true;
 }
 
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
@@ -89,8 +90,9 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
     dst.assign(depthMap);
 }
 
-std::vector<float> DepthEstimator::calcDepth(const std::vector<char> &leftImageEncoded,
-                                             const std::vector<char> &rightImageEncoded, int width, int height) const {
+std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftImageEncoded,
+                                                 const std::vector<char> &rightImageEncoded,
+                                                 int width, int height) const {
     cv::Mat leftImage, rightImage, depthMap;
     cv::Size imageSize(width, height);
 
