@@ -10,7 +10,7 @@
 DepthEstimator::DepthEstimator(const std::string &calibPath) {
     // TODO: call calibrate
 
-    LOGI(TAG, "Loading calibration parameters from %s...", calibPath);
+    LOGI(TAG, "Loading calibration parameters from %s...", calibPath.c_str());
 
     cv::FileStorage fs(calibPath, cv::FileStorage::READ);
 
