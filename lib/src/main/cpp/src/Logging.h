@@ -1,26 +1,78 @@
-#ifndef SGBM_ANDROID_CORE_LOGGING_H
-#define SGBM_ANDROID_CORE_LOGGING_H
+#ifndef LIB_SRC_MAIN_CPP_SRC_LOGGING_H_
+#define LIB_SRC_MAIN_CPP_SRC_LOGGING_H_
 
 #if __has_include(<android/log.h>)
 
 #include <android/log.h>
 
-#define LOGV(tag, ...) __android_log_print(ANDROID_LOG_VERBOSE, tag, __VA_ARGS__)
-#define LOGD(tag, ...) __android_log_print(ANDROID_LOG_DEBUG, tag, __VA_ARGS__)
-#define LOGI(tag, ...) __android_log_print(ANDROID_LOG_INFO, tag, __VA_ARGS__)
-#define LOGW(tag, ...) __android_log_print(ANDROID_LOG_WARN, tag, __VA_ARGS__)
-#define LOGE(tag, ...) __android_log_print(ANDROID_LOG_ERROR, tag, __VA_ARGS__)
+// TODO(TimPushkin): find way to fix vararg passing
+
+void logV(const char *tag, const char *format...) {
+    __android_log_print(ANDROID_LOG_VERBOSE, tag, format);
+}
+
+void logD(const char *tag, const char *format...) {
+    __android_log_print(ANDROID_LOG_DEBUG, tag, format);
+}
+
+void logI(const char *tag, const char *format...) {
+    __android_log_print(ANDROID_LOG_DEBUG, tag, format);
+}
+
+void logW(const char *tag, const char *format...) {
+    __android_log_print(ANDROID_LOG_DEBUG, tag, format);
+}
+
+void logE(const char *tag, const char *format...) {
+    __android_log_print(ANDROID_LOG_DEBUG, tag, format);
+}
 
 #else
 
 #include <cstdio>
+#include <cstdarg>
 
-#define LOGV(tag, format, ...) std::fprintf(stderr, "V " tag ": " format "\n", ##__VA_ARGS__)
-#define LOGD(tag, format, ...) std::fprintf(stderr, "D " tag ": " format "\n", ##__VA_ARGS__)
-#define LOGI(tag, format, ...) std::fprintf(stderr, "I " tag ": " format "\n", ##__VA_ARGS__)
-#define LOGW(tag, format, ...) std::fprintf(stderr, "W " tag ": " format "\n", ##__VA_ARGS__)
-#define LOGE(tag, format, ...) std::fprintf(stderr, "E " tag ": " format "\n", ##__VA_ARGS__)
+static void log(const char *lvl, const char *tag, const char *fmt, std::va_list args) {
+    std::fprintf(stderr, "%s %s: ", lvl, tag);
+    std::vfprintf(stderr, fmt, args);
+    std::fprintf(stderr, "\n");
+}
+
+void logV(const char *tag, const char *format...) {
+    std::va_list args;
+    va_start(args, format);
+    log("V", tag, format, args);
+    va_end(args);
+}
+
+void logD(const char *tag, const char *format...) {
+    std::va_list args;
+    va_start(args, format);
+    log("D", tag, format, args);
+    va_end(args);
+}
+
+void logI(const char *tag, const char *format...) {
+    std::va_list args;
+    va_start(args, format);
+    log("I", tag, format, args);
+    va_end(args);
+}
+
+void logW(const char *tag, const char *format...) {
+    std::va_list args;
+    va_start(args, format);
+    log("W", tag, format, args);
+    va_end(args);
+}
+
+void logE(const char *tag, const char *format...) {
+    std::va_list args;
+    va_start(args, format);
+    log("E", tag, format, args);
+    va_end(args);
+}
 
 #endif
 
-#endif
+#endif  // LIB_SRC_MAIN_CPP_SRC_LOGGING_H_

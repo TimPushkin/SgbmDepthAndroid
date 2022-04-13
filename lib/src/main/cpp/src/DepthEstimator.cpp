@@ -5,17 +5,17 @@
 #include "Conversions.h"
 #include "Logging.h"
 
-#define TAG "DepthEstimator"
+constexpr char DepthEstimator::kTag[];
 
 DepthEstimator::DepthEstimator(const std::string &calibPath) {
-    // TODO: call calibrate
+    // TODO(TimPushkin): call calibrate
 
-    LOGI(TAG, "Loading calibration parameters from %s...", calibPath.c_str());
+    logI(kTag, "Loading calibration parameters from %s...", calibPath.c_str());
 
     cv::FileStorage fs(calibPath, cv::FileStorage::READ);
 
     if (!fs.isOpened()) {
-        LOGE(TAG, "Failed to read calibration parameters from the received file");
+        logE(kTag, "Failed to read calibration parameters from the received file");
         throw std::invalid_argument("Illegal calibration file format");
     }
 
@@ -25,12 +25,12 @@ DepthEstimator::DepthEstimator(const std::string &calibPath) {
     fs["rightMapY"] >> mRightMap.second;
     fs["Q"] >> mQ;
 
-    LOGD(TAG, "Loaded calibration parameters:\n"
-              "- LeftMapX has size %i x %i\n"
-              "- LeftMapY has size %i x %i\n"
-              "- RightMapX has size %i x %i\n"
-              "- RightMapY has size %i x %i\n"
-              "- Q has size %i x %i",
+    logD(kTag, "Loaded calibration parameters:\n"
+               "- LeftMapX has size %i x %i\n"
+               "- LeftMapY has size %i x %i\n"
+               "- RightMapX has size %i x %i\n"
+               "- RightMapY has size %i x %i\n"
+               "- Q has size %i x %i",
          mLeftMap.first.cols, mLeftMap.first.rows,
          mLeftMap.second.cols, mLeftMap.second.rows,
          mRightMap.first.cols, mRightMap.first.rows,
@@ -39,12 +39,12 @@ DepthEstimator::DepthEstimator(const std::string &calibPath) {
 }
 
 bool DepthEstimator::calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage) {
-    // TODO: fill calibration parameters
+    // TODO(TimPushkin): fill calibration parameters
     return true;
 }
 
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
-    LOGI(TAG, "Computing disparity...");
+    logI(kTag, "Computing disparity...");
 
     cv::Mat leftImageGray, rightImageGray;
 
@@ -70,13 +70,12 @@ void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray right
             uniquenessRatio,
             speckleWindowSize,
             speckleRange,
-            cv::StereoSGBM::MODE_SGBM_3WAY
-    );
+            cv::StereoSGBM::MODE_SGBM_3WAY);
     sgbm->compute(leftImageGray, rightImageGray, dst);
 }
 
 void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const {
-    LOGI(TAG, "Getting depth from disparity...");
+    logI(kTag, "Getting depth from disparity...");
 
     cv::Mat image3d, depthMap;
 
@@ -96,14 +95,14 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
     cv::Mat leftImage, rightImage, depthMap;
     cv::Size imageSize(width, height);
 
-    LOGI(TAG, "Preparing images for depth calculation...");
+    logI(kTag, "Preparing images for depth calculation...");
 
     leftImage = cv::imdecode(leftImageEncoded, cv::IMREAD_COLOR);
     rightImage = cv::imdecode(rightImageEncoded, cv::IMREAD_COLOR);
 
-    LOGD(TAG, "Loaded images:\n"
-              "- Left image has size %i x %i\n"
-              "- Right image has size %i x %i\n",
+    logD(kTag, "Loaded images:\n"
+               "- Left image has size %i x %i\n"
+               "- Right image has size %i x %i",
          leftImage.cols, leftImage.rows,
          rightImage.cols, rightImage.rows);
 
@@ -116,7 +115,7 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
     getDisparity(leftImage, rightImage, depthMap);
     getDepthFromDisparity(depthMap * disparityCorrectionFactor, depthMap);
 
-    LOGI(TAG, "Depth calculation finished");
+    logI(kTag, "Depth calculation finished");
 
     return matToVector<float>(depthMap);
 }

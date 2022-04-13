@@ -1,10 +1,13 @@
-#ifndef SGBM_ANDROID_CORE_DEPTHESTIMATOR_H
-#define SGBM_ANDROID_CORE_DEPTHESTIMATOR_H
+#ifndef LIB_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+#define LIB_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
 
+#include <string>
+#include <vector>
+#include <utility>
 #include "opencv2/core.hpp"
 
 class DepthEstimator {
-public:
+ public:
     explicit DepthEstimator(const std::string &calibPath);
 
     bool calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage);
@@ -23,7 +26,9 @@ public:
 
     void setMaxDepth(float value);
 
-private:
+ private:
+    static constexpr char kTag[] = "DepthEstimator";
+
     std::pair<cv::Mat, cv::Mat> mLeftMap, mRightMap;
     cv::Mat mQ;
 
@@ -35,4 +40,4 @@ private:
     void getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const;
 };
 
-#endif
+#endif  // LIB_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
