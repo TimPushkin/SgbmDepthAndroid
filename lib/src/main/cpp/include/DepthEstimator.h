@@ -5,15 +5,13 @@
 
 class DepthEstimator {
 public:
-    explicit DepthEstimator(const char *content);
+    explicit DepthEstimator(const std::string &calibPath);
 
-    void loadCalibrationParams(const char *content, const std::string &leftMapXName = "leftMapX",
-                               const std::string &leftMapYName = "leftMapY",
-                               const std::string &rightMapXName = "rightMapX",
-                               const std::string &rightMapYName = "rightMapY", const std::string &qName = "Q");
+    bool calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage);
 
-    std::vector<float> calcDepth(const std::vector<char> &leftImage, const std::vector<char> &rightImage,
-                                 int width = 640, int height = 360) const;
+    std::vector<float> estimateDepth(const std::vector<char> &leftImageEncoded,
+                                     const std::vector<char> &rightImageEncoded,
+                                     int width = 640, int height = 360) const;
 
     void setMinDisparity(int value);
 
