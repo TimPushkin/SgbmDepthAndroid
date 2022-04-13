@@ -4,7 +4,7 @@
 #include <iostream>
 #include "../include/DepthEstimator.h"
 
-const int kCliArgsNum = 4;
+constexpr int kCliArgsNum = 4;
 
 inline std::vector<char> streamToVector(std::ifstream &s) {
     return {std::istreambuf_iterator<char>(s), std::istreambuf_iterator<char>()};
@@ -25,5 +25,5 @@ int main(int argc, char *argv[]) {
     DepthEstimator depthEstimator(calibPath);
     std::vector<float> depth = depthEstimator.estimateDepth(lImg, rImg);
 
-    for (const auto i: depth) std::cout << i << ' ';
+    for (const auto i : depth) std::cout << i << ' ';
 }
