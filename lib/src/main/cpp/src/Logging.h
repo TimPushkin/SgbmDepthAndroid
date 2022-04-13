@@ -13,13 +13,13 @@
 
 #else
 
-// TODO: add logging for non-Android platforms
+#include <cstdio>
 
-#define LOGV(tag, ...)
-#define LOGD(tag, ...)
-#define LOGI(tag, ...)
-#define LOGW(tag, ...)
-#define LOGE(tag, ...)
+#define LOGV(tag, format, ...) std::fprintf(stderr, "V " tag ": " format "\n", ##__VA_ARGS__)
+#define LOGD(tag, format, ...) std::fprintf(stderr, "D " tag ": " format "\n", ##__VA_ARGS__)
+#define LOGI(tag, format, ...) std::fprintf(stderr, "I " tag ": " format "\n", ##__VA_ARGS__)
+#define LOGW(tag, format, ...) std::fprintf(stderr, "W " tag ": " format "\n", ##__VA_ARGS__)
+#define LOGE(tag, format, ...) std::fprintf(stderr, "E " tag ": " format "\n", ##__VA_ARGS__)
 
 #endif
 
