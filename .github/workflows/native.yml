@@ -1,0 +1,46 @@
+name: Native
+
+on: [ push, workflow_dispatch ]
+
+env:
+  CC: clang
+  CXX: clang++
+  BUILD_TYPE: Debug
+  BUILD_DIR: build
+
+defaults:
+  run:
+    working-directory: lib/src/main/cpp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure CMake
+        run: |
+          sudo apt-get install ninja-build
+          cmake -G Ninja -B ${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
+
+      - name: Build
+        run: cmake --build ${{env.BUILD_DIR}} --config ${{env.BUILD_TYPE}}
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure linters
+        run: |
+          pip install cpplint
+          sudo apt-get install clang-tidy
+
+      - name: Run cpplint
+        run: cpplint --recursive .
+
+      - name: Run clang-tidy
+        run: run-clang-tidy -p ${{env.BUILD_DIR}} -checks android-*,bugprone-*,google-*,performance-*,portatibility-*,readability-*
