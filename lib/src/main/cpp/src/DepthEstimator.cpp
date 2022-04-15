@@ -46,15 +46,16 @@ bool DepthEstimator::calibrate(const std::vector<char> &leftImage, const std::ve
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
     logI(kTag, "Computing disparity...");
 
-    cv::Mat leftImageGray, rightImageGray;
+    cv::Mat leftImageGray;
+    cv::Mat rightImageGray;
 
-    int numDisparities = maxDisparity - minDisparity,
-            P1 = 8 * 3 * blockSize * blockSize,
-            P2 = 32 * 3 * blockSize * blockSize,
-            disp12MaxDiff = 1,
-            uniquenessRatio = 5,
-            speckleWindowSize = 50,
-            speckleRange = 2;
+    int numDisparities = maxDisparity - minDisparity;
+    int P1 = 8 * 3 * blockSize * blockSize;
+    int P2 = 32 * 3 * blockSize * blockSize;
+    constexpr int disp12MaxDiff = 1;
+    constexpr int uniquenessRatio = 5;
+    constexpr int speckleWindowSize = 50;
+    constexpr int speckleRange = 2;
 
     cv::cvtColor(leftImage, leftImageGray, cv::COLOR_BGR2GRAY);
     cv::cvtColor(rightImage, rightImageGray, cv::COLOR_BGR2GRAY);
@@ -77,7 +78,8 @@ void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray right
 void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const {
     logI(kTag, "Getting depth from disparity...");
 
-    cv::Mat image3d, depthMap;
+    cv::Mat image3d;
+    cv::Mat depthMap;
 
     cv::reprojectImageTo3D(disparity, image3d, mQ);
 
@@ -92,7 +94,9 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
 std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftImageEncoded,
                                                  const std::vector<char> &rightImageEncoded,
                                                  int width, int height) const {
-    cv::Mat leftImage, rightImage, depthMap;
+    cv::Mat leftImage;
+    cv::Mat rightImage;
+    cv::Mat depthMap;
     cv::Size imageSize(width, height);
 
     logI(kTag, "Preparing images for depth calculation...");

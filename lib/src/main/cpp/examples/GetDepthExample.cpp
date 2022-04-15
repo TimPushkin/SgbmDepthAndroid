@@ -17,13 +17,20 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    auto calibPath = argv[1], leftImgPath = argv[2], rightImgPath = argv[3];
+    auto *calibPath = argv[1];
+    auto *leftImgPath = argv[2];
+    auto *rightImgPath = argv[3];
 
-    std::ifstream lImgStream(leftImgPath), rImgStream(rightImgPath);
-    auto lImg = streamToVector(lImgStream), rImg = streamToVector(rImgStream);
+    std::ifstream lImgStream(leftImgPath);
+    std::ifstream rImgStream(rightImgPath);
+
+    auto lImg = streamToVector(lImgStream);
+    auto rImg = streamToVector(rImgStream);
 
     DepthEstimator depthEstimator(calibPath);
     std::vector<float> depth = depthEstimator.estimateDepth(lImg, rImg);
 
-    for (const auto i : depth) std::cout << i << ' ';
+    for (const auto i : depth) {
+        std::cout << i << ' ';
+    }
 }
