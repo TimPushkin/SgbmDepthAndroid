@@ -51,4 +51,4 @@ jobs:
         run: cpplint --recursive .
 
       - name: Run clang-tidy
-        run: run-clang-tidy -p ${{env.BUILD_SUBDIR}} -checks android-*,bugprone-*,google-*,performance-*,portatibility-*,readability-*
+        run: run-clang-tidy -p ${{env.BUILD_SUBDIR}}
