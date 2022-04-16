@@ -21,12 +21,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
+      - name: Cache build artifacts
+        uses: actions/cache@v3
         with:
           path: |
             ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
             ${{env.CCACHE_DIR}}
           key: ${{runner.os}}-build-cache
+
+      - name: Cache compile commands
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}/compile_commands.json
+          key: ${{runner.os}}-compile-commands
 
       - name: Configure ccache
         run: sudo apt-get install ccache
@@ -41,6 +48,18 @@ jobs:
 
       - name: Print ccache stats
         run: ccache -s
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}/compile_commands.json
+          key: ${{runner.os}}-compile-commands
 
       - name: Configure linters
         run: |
