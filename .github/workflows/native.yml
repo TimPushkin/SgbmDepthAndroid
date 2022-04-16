@@ -44,7 +44,7 @@ jobs:
           cmake -G Ninja -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
 
       - name: Build
-        run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}} -v
+        run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
 
       - name: Print ccache stats
         run: ccache -s
