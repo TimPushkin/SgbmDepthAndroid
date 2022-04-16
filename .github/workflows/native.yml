@@ -8,7 +8,6 @@ env:
   BUILD_TYPE: Debug
   PROJECT_SUBDIR: lib/src/main/cpp
   BUILD_SUBDIR: build
-  CCACHE_DIR: ${{github.workspace}}/.cache/ccache
 
 defaults:
   run:
@@ -21,12 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: hendrikmuhs/ccache-action@v1.2
+
       - name: Cache build artifacts
         uses: actions/cache@v3
         with:
-          path: |
-            ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-            ${{env.CCACHE_DIR}}
+          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
           key: ${{runner.os}}-build-cache
 
       - name: Cache compile commands
@@ -35,9 +34,6 @@ jobs:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}/compile_commands.json
           key: ${{runner.os}}-compile-commands
 
-      - name: Configure ccache
-        run: sudo apt-get install ccache
-
       - name: Configure CMake
         run: |
           sudo apt-get install ninja-build
@@ -45,9 +41,6 @@ jobs:
 
       - name: Build
         run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
-
-      - name: Print ccache stats
-        run: ccache -s
 
   lint:
     needs: build
