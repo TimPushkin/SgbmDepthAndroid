@@ -12,7 +12,7 @@ inline std::vector<char> streamToVector(std::ifstream &s) {
 
 int main(int argc, char *argv[]) {
     if (argc != kCliArgsNum) {
-        std::cerr << "Illegal CLI arguments num. Expected " << kCliArgsNum << "(including the command name) but was "
+        std::cerr << "Illegal CLI arguments num. Expected " << kCliArgsNum << " (including the command name) but was "
                   << argc;
         return 1;
     }
