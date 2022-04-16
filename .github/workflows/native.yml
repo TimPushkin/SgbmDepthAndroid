@@ -27,13 +27,6 @@ jobs:
       - name: Build
         run: cmake --build ${{env.BUILD_DIR}} --config ${{env.BUILD_TYPE}}
 
-  lint:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
       - name: Configure linters
         run: |
           pip install cpplint
