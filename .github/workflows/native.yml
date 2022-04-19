@@ -6,12 +6,12 @@ env:
   CC: clang
   CXX: clang++
   BUILD_TYPE: Debug
-  PROJECT_SUBDIR: lib/src/main/cpp
+  PROJECT_SUBDIR: sgbmandroid/src/main/cpp
   BUILD_SUBDIR: build
 
 defaults:
   run:
-    working-directory: lib/src/main/cpp  # Must be the same as env.PROJECT_SUBDIR
+    working-directory: sgbmandroid/src/main/cpp  # Must be the same as env.PROJECT_SUBDIR
 
 jobs:
   build:
