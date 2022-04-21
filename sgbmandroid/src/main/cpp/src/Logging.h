@@ -1,5 +1,5 @@
-#ifndef LIB_SRC_MAIN_CPP_SRC_LOGGING_H_
-#define LIB_SRC_MAIN_CPP_SRC_LOGGING_H_
+#ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
+#define SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
 
 #if __has_include(<android/log.h>)
 
@@ -90,4 +90,4 @@ void logE(const char *tag, const char *format...) {
 
 #endif
 
-#endif  // LIB_SRC_MAIN_CPP_SRC_LOGGING_H_
+#endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_

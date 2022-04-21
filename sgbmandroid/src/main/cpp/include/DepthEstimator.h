@@ -1,10 +1,12 @@
-#ifndef LIB_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
-#define LIB_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+#ifndef SGBMANDROID_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+#define SGBMANDROID_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
 
 #include <string>
 #include <vector>
 #include <utility>
 #include "opencv2/core.hpp"
+
+namespace sgbmandroid {
 
 class DepthEstimator {
  public:
@@ -40,4 +42,6 @@ class DepthEstimator {
     void getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const;
 };
 
-#endif  // LIB_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+}  // namespace sgbmandroid
+
+#endif  // SGBMANDROID_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
