@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+    id 'org.bytedeco.gradle-javacpp-build' version '1.5.7'
 }
 
 android {
@@ -31,9 +31,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
@@ -42,6 +39,49 @@ android {
     }
 }
 
+android.libraryVariants.all { variant ->
+    def variantName = variant.name.capitalize() // either "Debug" or "Release"
+    def javaCompile = project.tasks.getByName("compile${variantName}JavaWithJavac")
+    def configureCMake = project.tasks.findAll {
+        it.name.startsWith("configureCMake${variantName}")
+    }
+
+    // Compiles SgbmAndroidConfig.java
+    task "javacppCompileJava$variantName"(type: JavaCompile) {
+        include 'me/timpushkin/sgbmandroid/SgbmAndroidConfig.java'
+        source = javaCompile.source
+        classpath = javaCompile.classpath
+        destinationDir = javaCompile.destinationDir
+    }
+
+    // Parses DepthEstimator.h and outputs SgbmAndroid.java
+    task "javacppBuildParser$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
+        dependsOn "javacppCompileJava$variantName"
+        classPath = [javaCompile.destinationDir]
+        includePath = ["$projectDir/src/main/cpp/include"]
+        classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroidConfig']
+        outputDirectory = file("$projectDir/src/main/java/")
+    }
+
+    // Compiles SgbmAndroid.java and everything else
+    javaCompile.dependsOn "javacppBuildParser$variantName"
+
+    // Generates jnijavacpp.cpp and jniSgbmAndroid.cpp
+    task "javacppBuildCompiler$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
+        dependsOn javaCompile
+        classPath = [javaCompile.destinationDir]
+        classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroid']
+        compile = false
+        deleteJniFiles = false
+        outputDirectory = file("$projectDir/src/main/cpp/src")
+    }
+
+    // Picks up the C++ files listed in CMakeLists.txt
+    configureCMake.forEach {
+        it.dependsOn "javacppBuildCompiler$variantName"
+    }
+}
+
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'org.bytedeco:javacpp:1.5.7'
 }
