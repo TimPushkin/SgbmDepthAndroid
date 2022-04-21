@@ -5,6 +5,8 @@
 #include "Conversions.h"
 #include "Logging.h"
 
+namespace sgbmandroid {
+
 constexpr char DepthEstimator::kTag[];
 
 DepthEstimator::DepthEstimator(const std::string &calibPath) {
@@ -133,3 +135,5 @@ void DepthEstimator::setBlockSize(int value) { blockSize = value; }
 void DepthEstimator::setDisparityCorrectionFactor(float value) { disparityCorrectionFactor = value; }
 
 void DepthEstimator::setMaxDepth(float value) { maxDepth = value; }
+
+}  // namespace sgbmandroid

@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     auto lImg = streamToVector(lImgStream);
     auto rImg = streamToVector(rImgStream);
 
-    DepthEstimator depthEstimator(calibPath);
+    sgbmandroid::DepthEstimator depthEstimator(calibPath);
     std::vector<float> depth = depthEstimator.estimateDepth(lImg, rImg);
 
     for (const auto i : depth) {

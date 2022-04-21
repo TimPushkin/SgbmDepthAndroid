@@ -1,5 +1,5 @@
-#ifndef LIB_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
-#define LIB_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
+#ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
+#define SGBMANDROID_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
 
 #include <vector>
 #include "opencv2/core.hpp"
@@ -12,4 +12,4 @@ std::vector<T> matToVector(const cv::Mat &mat) {
     return result;
 }
 
-#endif  // LIB_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
+#endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
