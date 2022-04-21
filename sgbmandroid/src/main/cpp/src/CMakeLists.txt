@@ -1,6 +1,7 @@
 project("sgbm_android_core")
 
-set(SOURCE_FILES DepthEstimator.cpp)
+# Globbing is used to detect generated files like JNI bindings
+file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 
 set(OPENCV_VERSION 4.5.5)
 set(OPENCV_INSTALL_DIR ${CMAKE_BINARY_DIR}/opencv-install)
