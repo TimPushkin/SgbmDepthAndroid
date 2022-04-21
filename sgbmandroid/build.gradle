@@ -37,48 +37,55 @@ android {
             version '3.18.1'
         }
     }
-}
 
-android.libraryVariants.all { variant ->
-    def variantName = variant.name.capitalize() // either "Debug" or "Release"
-    def javaCompile = project.tasks.getByName("compile${variantName}JavaWithJavac")
-    def configureCMake = project.tasks.findAll {
-        it.name.startsWith("configureCMake${variantName}")
+    sourceSets {
+        main {
+            java.srcDirs += "$buildDir/javacpp"
+        }
     }
 
-    // Compiles SgbmAndroidConfig.java
-    task "javacppCompileJava$variantName"(type: JavaCompile) {
-        include 'me/timpushkin/sgbmandroid/SgbmAndroidConfig.java'
-        source = javaCompile.source
-        classpath = javaCompile.classpath
-        destinationDir = javaCompile.destinationDir
-    }
+    // Configure javacpp
+    libraryVariants.all { variant ->
+        def variantName = variant.name.capitalize() // either "Debug" or "Release"
+        def javaCompile = tasks.getByName("compile${variantName}JavaWithJavac")
+        def configureCMake = tasks.findAll {
+            it.name.startsWith("configureCMake$variantName")
+        }
 
-    // Parses DepthEstimator.h and outputs SgbmAndroid.java
-    task "javacppBuildParser$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
-        dependsOn "javacppCompileJava$variantName"
-        classPath = [javaCompile.destinationDir]
-        includePath = ["$projectDir/src/main/cpp/include"]
-        classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroidConfig']
-        outputDirectory = file("$projectDir/src/main/java/")
-    }
+        // Compiles SgbmAndroidConfig.java
+        task "javacppCompileJava$variantName"(type: JavaCompile) {
+            include 'me/timpushkin/sgbmandroid/SgbmAndroidConfig.java'
+            source = javaCompile.source
+            classpath = javaCompile.classpath
+            destinationDir = javaCompile.destinationDir
+        }
 
-    // Compiles SgbmAndroid.java and everything else
-    javaCompile.dependsOn "javacppBuildParser$variantName"
+        // Parses DepthEstimator.h and outputs SgbmAndroid.java
+        task "javacppBuildParser$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
+            dependsOn "javacppCompileJava$variantName"
+            classPath = [javaCompile.destinationDir]
+            includePath = ["$projectDir/src/main/cpp/include"]
+            classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroidConfig']
+            outputDirectory = file("$buildDir/javacpp")
+        }
 
-    // Generates jnijavacpp.cpp and jniSgbmAndroid.cpp
-    task "javacppBuildCompiler$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
-        dependsOn javaCompile
-        classPath = [javaCompile.destinationDir]
-        classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroid']
-        compile = false
-        deleteJniFiles = false
-        outputDirectory = file("$projectDir/src/main/cpp/src")
-    }
+        // Compiles SgbmAndroid.java and everything else
+        javaCompile.dependsOn "javacppBuildParser$variantName"
 
-    // Picks up the C++ files listed in CMakeLists.txt
-    configureCMake.forEach {
-        it.dependsOn "javacppBuildCompiler$variantName"
+        // Generates jnijavacpp.cpp and jniSgbmAndroid.cpp
+        task "javacppBuildCompiler$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
+            dependsOn javaCompile
+            classPath = [javaCompile.destinationDir]
+            classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroid']
+            compile = false
+            deleteJniFiles = false
+            outputDirectory = file("$projectDir/src/main/cpp/src")
+        }
+
+        // Picks up the C++ files listed in CMakeLists.txt
+        configureCMake.forEach {
+            it.dependsOn "javacppBuildCompiler$variantName"
+        }
     }
 }
 
