@@ -47,17 +47,14 @@ android {
     // Configure javacpp
     libraryVariants.all { variant ->
         def variantName = variant.name.capitalize() // either "Debug" or "Release"
-        def javaCompile = tasks.getByName("compile${variantName}JavaWithJavac")
-        def configureCMake = tasks.findAll {
-            it.name.startsWith("configureCMake$variantName")
-        }
+        def javaCompile = tasks.getByName "compile${variantName}JavaWithJavac"
 
         // Compiles SgbmAndroidConfig.java
         task "javacppCompileJava$variantName"(type: JavaCompile) {
             include 'me/timpushkin/sgbmandroid/SgbmAndroidConfig.java'
             source = javaCompile.source
             classpath = javaCompile.classpath
-            destinationDir = javaCompile.destinationDir
+            destinationDirectory = javaCompile.destinationDir
         }
 
         // Parses DepthEstimator.h and outputs SgbmAndroid.java
@@ -72,6 +69,9 @@ android {
         // Compiles SgbmAndroid.java and everything else
         javaCompile.dependsOn "javacppBuildParser$variantName"
 
+        // Extracts annotations from SgbmAndroid.java and other source files
+        tasks.getByName("extract${variantName}Annotations").dependsOn "javacppBuildParser$variantName"
+
         // Generates jnijavacpp.cpp and jniSgbmAndroid.cpp
         task "javacppBuildCompiler$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
             dependsOn javaCompile
@@ -83,8 +83,10 @@ android {
         }
 
         // Picks up the C++ files listed in CMakeLists.txt
-        configureCMake.forEach {
-            it.dependsOn "javacppBuildCompiler$variantName"
+        tasks.forEach {
+            if (it.name.startsWith "configureCMake$variantName") {
+                it.dependsOn "javacppBuildCompiler$variantName"
+            }
         }
     }
 }
