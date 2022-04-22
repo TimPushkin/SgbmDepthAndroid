@@ -25,6 +25,12 @@ class MainActivity : ComponentActivity() {
     private lateinit var mStorageUtils: StorageUtils
     private lateinit var mDepthEstimator: DepthEstimator
 
+    companion object {
+        init {
+            System.loadLibrary("sgbmandroid")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
