@@ -1,4 +1,4 @@
-project("sgbm_android_core")
+project("sources")
 
 # Globbing is used to detect generated files like JNI bindings
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
@@ -8,9 +8,9 @@ set(OPENCV_INSTALL_DIR ${CMAKE_BINARY_DIR}/opencv-install)
 set(OPENCV_PUBLIC_LIBRARIES opencv_core)
 set(OPENCV_PRIVATE_LIBRARIES ${OPENCV_PUBLIC_LIBRARIES} opencv_calib3d opencv_imgproc opencv_imgcodecs opencv_flann)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_library(${LIB_NAME} SHARED ${SOURCE_FILES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 if (ANDROID)
     message(STATUS "Detected Android platform. Will use OpenCV Android SDK.")
@@ -67,12 +67,12 @@ else ()
             # -DCPU_BASELINE=NEON TODO: act accordingly to the current platform
             -DCMAKE_INSTALL_PREFIX=${OPENCV_INSTALL_DIR}
             )
-    target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/include/opencv4)
-    target_link_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/lib)
-    add_dependencies(${PROJECT_NAME} opencv)
+    target_include_directories(${LIB_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/include/opencv4)
+    target_link_directories(${LIB_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/lib)
+    add_dependencies(${LIB_NAME} opencv)
 
     set(log-lib "")
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENCV_PUBLIC_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${log-lib} ${OPENCV_PRIVATE_LIBRARIES})
+target_link_libraries(${LIB_NAME} PUBLIC ${OPENCV_PUBLIC_LIBRARIES})
+target_link_libraries(${LIB_NAME} PRIVATE ${log-lib} ${OPENCV_PRIVATE_LIBRARIES})

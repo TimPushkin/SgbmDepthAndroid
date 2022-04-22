@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project("sgbm_android")
+project("sgbmandroid")
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 
@@ -13,6 +13,8 @@ if (CCACHE_EXECUTABLE)
         endif ()
     endforeach ()
 endif ()
+
+set(LIB_NAME ${PROJECT_NAME})
 
 add_subdirectory(src)
 if (BUILD_EXAMPLES)
