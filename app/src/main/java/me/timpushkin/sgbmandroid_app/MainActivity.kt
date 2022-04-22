@@ -5,24 +5,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
+import me.timpushkin.sgbmandroid.SgbmAndroid.DepthEstimator
 import me.timpushkin.sgbmandroid_app.ui.elements.MenuButtons
 import me.timpushkin.sgbmandroid_app.ui.theme.MainTheme
 import me.timpushkin.sgbmandroid_app.utils.depthArrayToBitmap
-import me.timpushkin.sgbmandroid.SgbmAndroid.DepthEstimator
+import me.timpushkin.sgbmandroid_app.utils.StorageUtils
 
 private const val WIDTH = 640
 private const val HEIGHT = 360
 
 class MainActivity : ComponentActivity() {
-    private lateinit var depthEstimator: DepthEstimator
+    private lateinit var mStorageUtils: StorageUtils
+    private lateinit var mDepthEstimator: DepthEstimator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mStorageUtils = StorageUtils(this)
 
         setContent {
             MainTheme {
@@ -45,11 +51,12 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     backgroundColor = MaterialTheme.colors.background
-                ) {
-                    depthMap?.let {
+                ) { contentPadding ->
+                    depthMap?.let { bitmap ->
                         Image(
-                            bitmap = it,
-                            contentDescription = "Depth map"
+                            bitmap = bitmap,
+                            contentDescription = "Depth map",
+                            modifier = Modifier.padding(contentPadding)
                         )
                     }
                 }
@@ -58,14 +65,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun processParamsUri(uri: Uri, onError: (String) -> Unit) {
-        val inputStream = contentResolver.openInputStream(uri)
-        if (inputStream == null) {
-            onError("Cannot open calibration parameters")
-            return
+        val depthEstimator = with(mStorageUtils) {
+            uri.useTempCopy(".xml") { DepthEstimator(it.path) }
         }
 
-        // val params = inputStream.use { it.readBytes() }
-        depthEstimator = DepthEstimator("" /* TODO: pass calibration file path */)
+        if (depthEstimator != null) mDepthEstimator = depthEstimator
+        else onError("Cannot open calibration parameters")
     }
 
     private fun processImageUris(
@@ -76,7 +81,7 @@ class MainActivity : ComponentActivity() {
         contentResolver.openInputStream(leftUri)?.use { leftStream ->
             contentResolver.openInputStream(rightUri)?.use { rightStream ->
                 depthArrayToBitmap(
-                    depthEstimator.estimateDepth(
+                    mDepthEstimator.estimateDepth(
                         leftStream.readBytes(),
                         rightStream.readBytes(),
                         WIDTH,
