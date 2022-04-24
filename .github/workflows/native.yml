@@ -36,7 +36,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          sudo apt-get install ninja-build
+          sudo apt-get install ninja-build  # Ninja is used as the tool from Android's NDK
           cmake -G Ninja -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
 
       - name: Build
