@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroid_app
+package me.timpushkin.sgbmandroidapp
 
 import android.net.Uri
 import android.os.Bundle
@@ -6,17 +6,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
 import me.timpushkin.sgbmandroid.SgbmAndroid.DepthEstimator
-import me.timpushkin.sgbmandroid_app.ui.elements.MenuButtons
-import me.timpushkin.sgbmandroid_app.ui.theme.MainTheme
-import me.timpushkin.sgbmandroid_app.utils.depthArrayToBitmap
-import me.timpushkin.sgbmandroid_app.utils.StorageUtils
+import me.timpushkin.sgbmandroidapp.ui.elements.MenuButtons
+import me.timpushkin.sgbmandroidapp.utils.StorageUtils
+import me.timpushkin.sgbmandroidapp.utils.depthArrayToBitmap
 
 private const val WIDTH = 640
 private const val HEIGHT = 360
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
         mStorageUtils = StorageUtils(this)
 
         setContent {
-            MainTheme {
+            MaterialTheme {
                 val scope = rememberCoroutineScope()
                 val scaffoldState = rememberScaffoldState()
                 var depthMap by remember { mutableStateOf(null as ImageBitmap?) }
@@ -71,12 +72,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun processParamsUri(uri: Uri, onError: (String) -> Unit) {
-        val depthEstimator = with(mStorageUtils) {
-            uri.useTempCopy(".xml") { DepthEstimator(it.path) }
-        }
-
-        if (depthEstimator != null) mDepthEstimator = depthEstimator
-        else onError("Cannot open calibration parameters")
+        with(mStorageUtils) { uri.useTempCopy(".xml") { DepthEstimator(it.path) } }?.let {
+            mDepthEstimator = it
+        } ?: onError("Cannot open calibration parameters")
     }
 
     private fun processImageUris(

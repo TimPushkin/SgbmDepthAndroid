@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroid_app.utils
+package me.timpushkin.sgbmandroidapp.utils
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -11,7 +11,8 @@ private const val MAX_COLOR = 0xff
 fun depthArrayToBitmap(depthArray: FloatArray, width: Int, height: Int): Bitmap {
     Log.i(
         TAG,
-        "Converting depth array of size ${depthArray.size} to a Bitmap of size $width x $height = ${width * height}"
+        "Converting depth array of size ${depthArray.size} " +
+            "to a Bitmap of size $width x $height = ${width * height}"
     )
 
     val max = depthArray.maxOfOrNull { it }?.coerceAtLeast(Float.MIN_VALUE) ?: Float.MIN_VALUE

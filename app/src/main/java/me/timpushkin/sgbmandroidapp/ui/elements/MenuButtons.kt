@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroid_app.ui.elements
+package me.timpushkin.sgbmandroidapp.ui.elements
 
 import android.net.Uri
 import android.util.Log
@@ -26,14 +26,20 @@ fun MenuButtons(
 ) {
     val paramsPicker =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            if (uri != null) onParamsPick(uri)
-            else Log.e(TAG, "Parameters picking activity returned null URI")
+            if (uri != null) {
+                onParamsPick(uri)
+            } else {
+                Log.e(TAG, "Parameters picking activity returned null URI")
+            }
         }
 
     val imagesPicker =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-            if (uris.size == 2) onImagesPick(uris[0], uris[1])
-            else onError("Expected two images but was ${uris.size}")
+            if (uris.size == 2) {
+                onImagesPick(uris[0], uris[1])
+            } else {
+                onError("Expected two images but was ${uris.size}")
+            }
         }
 
     Row(
