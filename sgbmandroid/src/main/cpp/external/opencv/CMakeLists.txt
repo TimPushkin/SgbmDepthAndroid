@@ -34,7 +34,8 @@ else ()
 
     message(STATUS "Adding OpenCV as an external project")
     include(ExternalProject)
-    ExternalProject_Add(opencv
+    ExternalProject_Add(
+            opencv
             GIT_REPOSITORY https://github.com/opencv/opencv.git
             GIT_TAG ${OPENCV_VERSION}
             UPDATE_DISCONNECTED TRUE
@@ -58,7 +59,7 @@ else ()
             -DBUILD_LIST=calib3d,imgproc,imgcodecs,flann
             # -DCPU_BASELINE=NEON TODO: act accordingly to the current platform
             -DCMAKE_INSTALL_PREFIX=${OPENCV_INSTALL_DIR}
-            )
+    )
     message(STATUS "Adding OpenCV as an external project - done")
 
     target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INSTALL_DIR}/include/opencv4)

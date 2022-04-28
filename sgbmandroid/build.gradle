@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.library'
-    id 'org.bytedeco.gradle-javacpp-build' version '1.5.7'
 }
 
 android {
@@ -15,7 +14,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++11 -frtti -fexceptions'
-                arguments '-DANDROID_ARM_NEON=TRUE'
+                arguments '-DANDROID_ARM_NEON=TRUE -DSCAPIX_BRIDGE=java'
             }
         }
     }
@@ -40,57 +39,7 @@ android {
 
     sourceSets {
         main {
-            java.srcDirs += "$buildDir/javacpp"
+            java.srcDirs += 'src/main/cpp/generated/bridge/java'
         }
     }
-
-    // Configure javacpp
-    libraryVariants.all { variant ->
-        def variantName = variant.name.capitalize() // either "Debug" or "Release"
-        def javaCompile = tasks.getByName "compile${variantName}JavaWithJavac"
-
-        // Compiles SgbmAndroidConfig.java
-        task "javacppCompileJava$variantName"(type: JavaCompile) {
-            include 'me/timpushkin/sgbmandroid/SgbmAndroidConfig.java'
-            source = javaCompile.source
-            classpath = javaCompile.classpath
-            destinationDirectory = javaCompile.destinationDir
-        }
-
-        // Parses DepthEstimator.h and outputs SgbmAndroid.java
-        task "javacppBuildParser$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
-            dependsOn "javacppCompileJava$variantName"
-            classPath = [javaCompile.destinationDir]
-            includePath = ["$projectDir/src/main/cpp/include"]
-            classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroidConfig']
-            outputDirectory = file("$buildDir/javacpp")
-        }
-
-        // Compiles SgbmAndroid.java and everything else
-        javaCompile.dependsOn "javacppBuildParser$variantName"
-
-        // Extracts annotations from SgbmAndroid.java and other source files
-        tasks.getByName("extract${variantName}Annotations").dependsOn "javacppBuildParser$variantName"
-
-        // Generates jnijavacpp.cpp and jniSgbmAndroid.cpp
-        task "javacppBuildCompiler$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
-            dependsOn javaCompile
-            classPath = [javaCompile.destinationDir]
-            classOrPackageNames = ['me.timpushkin.sgbmandroid.SgbmAndroid']
-            compile = false
-            deleteJniFiles = false
-            outputDirectory = file("$projectDir/src/main/cpp/src")
-        }
-
-        // Picks up the C++ files listed in CMakeLists.txt
-        tasks.forEach {
-            if (it.name.startsWith "configureCMake$variantName") {
-                it.dependsOn "javacppBuildCompiler$variantName"
-            }
-        }
-    }
-}
-
-dependencies {
-    implementation 'org.bytedeco:javacpp:1.5.7'
 }

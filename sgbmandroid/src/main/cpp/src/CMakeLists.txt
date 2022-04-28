@@ -1,5 +1,4 @@
-# Globbing is used to detect generated files like JNI bindings
-file(GLOB SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
+set(SOURCE_FILES DepthEstimator.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 

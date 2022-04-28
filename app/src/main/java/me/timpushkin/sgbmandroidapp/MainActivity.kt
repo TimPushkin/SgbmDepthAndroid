@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
-import me.timpushkin.sgbmandroid.SgbmAndroid.DepthEstimator
+import me.timpushkin.sgbmandroid.DepthEstimator
 import me.timpushkin.sgbmandroidapp.ui.elements.MenuButtons
 import me.timpushkin.sgbmandroidapp.utils.StorageUtils
 import me.timpushkin.sgbmandroidapp.utils.depthArrayToBitmap
@@ -25,12 +25,6 @@ private const val HEIGHT = 360
 class MainActivity : ComponentActivity() {
     private lateinit var mStorageUtils: StorageUtils
     private lateinit var mDepthEstimator: DepthEstimator
-
-    companion object {
-        init {
-            System.loadLibrary("sgbmandroid")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
