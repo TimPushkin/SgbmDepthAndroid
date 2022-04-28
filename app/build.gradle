@@ -1,13 +1,14 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jlleitschuh.gradle.ktlint' version '10.2.1'
 }
 
 android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "me.timpushkin.sgbmandroid_app"
+        applicationId "me.timpushkin.sgbmandroidapp"
         minSdk 21
         targetSdk 31
         versionCode 1
@@ -58,4 +59,8 @@ dependencies {
     implementation 'org.bytedeco:javacpp:1.5.7' // TODO: remove this dependency
 
     implementation project(':sgbmandroid')
+}
+
+ktlint {
+    android = true
 }

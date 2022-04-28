@@ -1,13 +1,13 @@
-package me.timpushkin.sgbmandroid_app.utils
+package me.timpushkin.sgbmandroidapp.utils
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.google.modernstorage.storage.AndroidFileSystem
 import com.google.modernstorage.storage.toOkioPath
+import java.io.File
 import okio.IOException
 import okio.Path.Companion.toOkioPath
-import java.io.File
 
 private const val TAG = "StorageUtils"
 
