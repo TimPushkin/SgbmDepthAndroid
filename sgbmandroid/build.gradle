@@ -42,4 +42,5 @@ android {
             java.srcDirs += 'src/main/cpp/generated/bridge/java'
         }
     }
+    ndkVersion '23.1.7779620'
 }
