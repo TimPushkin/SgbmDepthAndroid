@@ -4,6 +4,7 @@ plugins {
 
 android {
     compileSdk 31
+    ndkVersion '23.1.7779620'
 
     defaultConfig {
         minSdk 21
@@ -42,5 +43,4 @@ android {
             java.srcDirs += 'src/main/cpp/generated/bridge/java'
         }
     }
-    ndkVersion '23.1.7779620'
 }
