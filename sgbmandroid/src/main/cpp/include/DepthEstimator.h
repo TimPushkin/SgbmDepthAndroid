@@ -4,12 +4,26 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include <scapix/bridge/object.h>
 #include "opencv2/core.hpp"
+
+#ifdef SCAPIX_BRIDGE
+
+#include <scapix/bridge/object.h>
+
+template<typename T>
+using base_object = scapix::bridge::object<T>;
+
+#else
+
+template<typename T>
+class base_object {
+};
+
+#endif  // SCAPIX_BRIDGE
 
 namespace sgbmandroid {
 
-class DepthEstimator : public scapix::bridge::object<DepthEstimator> {
+class DepthEstimator : public base_object<DepthEstimator> {
  public:
     explicit DepthEstimator(const std::string &calibPath);
 

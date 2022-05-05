@@ -19,6 +19,11 @@ add_subdirectory(src)
 add_subdirectory(external)
 
 if (BUILD_EXAMPLES)
-    message(STATUS "Will build examples")
-    add_subdirectory(examples)
+    if (NOT DEFINED SCAPIX_BRIDGE)
+        message(STATUS "Will build examples")
+        add_subdirectory(examples)
+    else ()
+        # Currently Scapix adds unwanted files to the 'examples' target
+        message(WARNING "Cannot build examples when Scapix is used")
+    endif ()
 endif ()
