@@ -14,8 +14,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags '-std=c++11 -frtti -fexceptions'
-                arguments '-DANDROID_ARM_NEON=TRUE -DSCAPIX_BRIDGE=java'
+                cppFlags '-std=c++11', '-frtti', '-fexceptions'
+                arguments '-DANDROID_ARM_NEON=TRUE', '-DSCAPIX_BRIDGE=java'
             }
         }
     }
