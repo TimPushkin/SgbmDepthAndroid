@@ -16,9 +16,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    outputs:
-      compile-commands: ${{steps.configure-cmake.outputs.compile-commands}}
-
     steps:
       - uses: actions/checkout@v3
 
@@ -28,13 +25,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-simple
+          key: ${{runner.os}}-build-cache-v3
 
       - name: Configure CMake
-        id: configure-cmake
-        run: |
-          cmake -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
-          echo "::set-output name=compile-commands::$(base64 -w 0 ${{env.BUILD_SUBDIR}}/compile_commands.json)"
+        run: cmake -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
 
       - name: Build
         run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
@@ -70,10 +64,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Prepare compile commands
-        run: |
-          mkdir -p ${{env.BUILD_SUBDIR}}
-          echo ${{needs.build.outputs.compile-commands}} | base64 -d > ${{env.BUILD_SUBDIR}}/compile_commands.json
+      - name: Cache build artifacts
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
+          key: ${{runner.os}}-build-cache-v3
 
       - name: Configure linters
         run: |
