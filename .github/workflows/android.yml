@@ -67,4 +67,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew :app:build
+        run: ./gradlew :sgbmandroid:build :app:build
