@@ -40,6 +40,7 @@ DepthEstimator::DepthEstimator(const std::string &calibPath) {
          mQ.cols, mQ.rows);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DepthEstimator::calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage) {
     // TODO(TimPushkin): fill calibration parameters
     return true;
