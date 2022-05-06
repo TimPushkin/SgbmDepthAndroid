@@ -17,28 +17,28 @@ void logV(const char *tag, const char *format...) {
 void logD(const char *tag, const char *format...) {
     std::va_list args;
     va_start(args, format);
-    __android_log_print(ANDROID_LOG_DEBUG, tag, format, args);
+    __android_log_vprint(ANDROID_LOG_DEBUG, tag, format, args);
     va_end(args);
 }
 
 void logI(const char *tag, const char *format...) {
     std::va_list args;
     va_start(args, format);
-    __android_log_print(ANDROID_LOG_DEBUG, tag, format, args);
+    __android_log_vprint(ANDROID_LOG_DEBUG, tag, format, args);
     va_end(args);
 }
 
 void logW(const char *tag, const char *format...) {
     std::va_list args;
     va_start(args, format);
-    __android_log_print(ANDROID_LOG_DEBUG, tag, format, args);
+    __android_log_vprint(ANDROID_LOG_DEBUG, tag, format, args);
     va_end(args);
 }
 
 void logE(const char *tag, const char *format...) {
     std::va_list args;
     va_start(args, format);
-    __android_log_print(ANDROID_LOG_DEBUG, tag, format, args);
+    __android_log_vprint(ANDROID_LOG_DEBUG, tag, format, args);
     va_end(args);
 }
 
