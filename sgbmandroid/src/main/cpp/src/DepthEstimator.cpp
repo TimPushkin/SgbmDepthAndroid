@@ -9,16 +9,6 @@ namespace sgbmandroid {
 
 constexpr auto kTag = "DepthEstimator";
 
-constexpr auto minDisparity = 0;
-constexpr auto p1Multiplier = 8 * 3;
-constexpr auto p2Multiplier = 32 * 3;
-constexpr auto disp12MaxDiff = 1;
-constexpr auto preFilterCap = 0;
-constexpr auto uniquenessRatio = 5;
-constexpr auto speckleRange = 2;
-
-constexpr auto disparityCorrectionFactor = 1.0F / 16;
-
 DepthEstimator::DepthEstimator(const std::string &calibPath) {
     // TODO(TimPushkin): call calibrate
 
@@ -62,25 +52,9 @@ void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray right
     cv::Mat leftImageGray;
     cv::Mat rightImageGray;
 
-    int numDisparities = maxDisparity - minDisparity;
-    int P1 = p1Multiplier * blockSize * blockSize;
-    int P2 = p2Multiplier * blockSize * blockSize;
-
     cv::cvtColor(leftImage, leftImageGray, cv::COLOR_BGR2GRAY);
     cv::cvtColor(rightImage, rightImageGray, cv::COLOR_BGR2GRAY);
 
-    cv::Ptr<cv::StereoSGBM> sgbm = cv::StereoSGBM::create(
-            minDisparity,
-            numDisparities,
-            blockSize,
-            P1,
-            P2,
-            disp12MaxDiff,
-            preFilterCap,
-            uniquenessRatio,
-            speckleWindowSize,
-            speckleRange,
-            cv::StereoSGBM::MODE_SGBM_3WAY);
     sgbm->compute(leftImageGray, rightImageGray, dst);
 }
 
@@ -131,18 +105,22 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
     }
 
     getDisparity(leftImage, rightImage, depthMap);
-    getDepthFromDisparity(depthMap * disparityCorrectionFactor, depthMap);
+    getDepthFromDisparity(depthMap * internal::disparityCorrectionFactor, depthMap);
 
     logI(kTag, "Depth calculation finished");
 
     return matToVector<float>(depthMap);
 }
 
-void DepthEstimator::setMaxDisparity(int value) { maxDisparity = value; }
+void DepthEstimator::setMaxDisparity(int value) { sgbm->setNumDisparities(value - internal::minDisparity); }
 
-void DepthEstimator::setBlockSize(int value) { blockSize = value; }
+void DepthEstimator::setBlockSize(int value) {
+    sgbm->setBlockSize(value);
+    sgbm->setP1(internal::p1Multiplier * value * value);
+    sgbm->setP2(internal::p2Multiplier * value * value);
+}
 
-void DepthEstimator::setSpeckleWindowSize(int value) { speckleWindowSize = value; }
+void DepthEstimator::setSpeckleWindowSize(int value) { sgbm->setSpeckleWindowSize(value); }
 
 void DepthEstimator::setMinDepth(float value) { minDepth = value; }
 
