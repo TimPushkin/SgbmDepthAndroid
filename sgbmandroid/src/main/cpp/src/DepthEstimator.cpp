@@ -121,7 +121,8 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
     cv::remap(rightImage, rightImage, mRightMap.first, mRightMap.second, cv::INTER_LINEAR);
 
     if (imageScaleFactor != 1) {
-        cv::Size imageSize(leftImage.cols * imageScaleFactor, leftImage.rows * imageScaleFactor);
+        cv::Size imageSize(static_cast<int> (static_cast<float> (leftImage.cols) * imageScaleFactor),
+                           static_cast<int> (static_cast<float> (leftImage.rows) * imageScaleFactor));
 
         logD(kTag, "Scaling images to: %i x %i", imageSize.width, imageSize.height);
 
