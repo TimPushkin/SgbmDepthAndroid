@@ -1,7 +1,6 @@
-package me.timpushkin.sgbmandroidapp.ui.elements
+package me.timpushkin.sgbmandroidapp.ui
 
 import android.net.Uri
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,13 +12,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-private const val TAG = "MenuButtons"
-
 private val XML_MIME = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xml") ?: "*/*"
 private const val IMG_MIME = "image/*"
 
 @Composable
 fun MenuButtons(
+    showPickImagesButton: Boolean,
     onParamsPick: (Uri) -> Unit,
     onImagesPick: (Uri, Uri) -> Unit,
     onError: (String) -> Unit
@@ -29,7 +27,7 @@ fun MenuButtons(
             if (uri != null) {
                 onParamsPick(uri)
             } else {
-                Log.e(TAG, "Parameters picking activity returned null URI")
+                onError("No parameters picked")
             }
         }
 
@@ -50,8 +48,10 @@ fun MenuButtons(
             Text("Load parameters")
         }
 
-        Button(onClick = { imagesPicker.launch(arrayOf(IMG_MIME)) }) {
-            Text("Load images")
+        if (showPickImagesButton) {
+            Button(onClick = { imagesPicker.launch(arrayOf(IMG_MIME)) }) {
+                Text("Load images")
+            }
         }
     }
 }

@@ -1,31 +1,44 @@
 package me.timpushkin.sgbmandroidapp.utils
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import com.google.modernstorage.storage.AndroidFileSystem
 import com.google.modernstorage.storage.toOkioPath
 import java.io.File
+import java.io.FileNotFoundException
 import okio.IOException
 import okio.Path.Companion.toOkioPath
 
 private const val TAG = "StorageUtils"
 
-private const val TMP_PREFIX = "tmp"
-
 class StorageUtils(private val context: Context) {
     private val mFileSystem = AndroidFileSystem(context)
 
-    private fun getTempCopy(src: Uri, suffix: String? = null): File? =
+    fun Uri.copyToCache(filename: String): File? =
         try {
-            File.createTempFile(TMP_PREFIX, suffix, context.cacheDir).also { copy ->
-                mFileSystem.copy(src.toOkioPath(), copy.toOkioPath())
+            File(context.cacheDir, filename).also { copy ->
+                mFileSystem.copy(toOkioPath(), copy.toOkioPath())
             }
         } catch (e: IOException) {
-            Log.e(TAG, "Failed to copy $src", e)
+            Log.e(TAG, "Failed to copy $this to $filename", e)
             null
         }
 
-    fun <T> Uri.useTempCopy(suffix: String? = null, action: (File) -> T): T? =
-        getTempCopy(this, suffix)?.let { tmp -> action(tmp).also { tmp.delete() } }
+    fun Bitmap.writeToCache(filename: String): File? {
+        val file = File(context.cacheDir, filename)
+
+        val success = try {
+            file.outputStream().use { out -> compress(Bitmap.CompressFormat.PNG, 100, out) }
+        } catch (e: FileNotFoundException) {
+            Log.e(TAG, "Failed to write a bitmap to $filename", e)
+            false
+        }
+
+        return if (success) file else null.also { file.delete() }
+    }
+
+    fun getFromCache(filename: String): File? =
+        File(context.cacheDir, filename).takeIf { it.exists() }
 }
