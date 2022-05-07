@@ -7,7 +7,17 @@
 
 namespace sgbmandroid {
 
-constexpr char DepthEstimator::kTag[];
+constexpr auto kTag = "DepthEstimator";
+
+constexpr auto minDisparity = 0;
+constexpr auto p1Multiplier = 8 * 3;
+constexpr auto p2Multiplier = 32 * 3;
+constexpr auto disp12MaxDiff = 1;
+constexpr auto preFilterCap = 0;
+constexpr auto uniquenessRatio = 5;
+constexpr auto speckleRange = 2;
+
+constexpr auto disparityCorrectionFactor = 1.0F / 16;
 
 DepthEstimator::DepthEstimator(const std::string &calibPath) {
     // TODO(TimPushkin): call calibrate
@@ -53,12 +63,8 @@ void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray right
     cv::Mat rightImageGray;
 
     int numDisparities = maxDisparity - minDisparity;
-    int P1 = 8 * 3 * blockSize * blockSize;
-    int P2 = 32 * 3 * blockSize * blockSize;
-    constexpr int disp12MaxDiff = 1;
-    constexpr int uniquenessRatio = 5;
-    constexpr int speckleWindowSize = 50;
-    constexpr int speckleRange = 2;
+    int P1 = p1Multiplier * blockSize * blockSize;
+    int P2 = p2Multiplier * blockSize * blockSize;
 
     cv::cvtColor(leftImage, leftImageGray, cv::COLOR_BGR2GRAY);
     cv::cvtColor(rightImage, rightImageGray, cv::COLOR_BGR2GRAY);
@@ -70,7 +76,7 @@ void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray right
             P1,
             P2,
             disp12MaxDiff,
-            0,
+            preFilterCap,
             uniquenessRatio,
             speckleWindowSize,
             speckleRange,
@@ -87,20 +93,18 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
     cv::reprojectImageTo3D(disparity, image3d, mQ);
 
     depthMap.create(image3d.size(), CV_32FC1);
-    image3d.forEach<cv::Point3f>([&](cv::Point3f &point, const int pos[]) -> void {
-        depthMap.at<float>(pos[0], pos[1]) = 0 <= point.z && point.z <= maxDepth ? point.z : 0;
+    image3d.forEach<cv::Point3f>([&](cv::Point3f &point, const int *pos) -> void {
+        depthMap.at<float>(pos[0], pos[1]) = minDepth <= point.z && point.z <= maxDepth ? point.z : 0;
     });
 
     dst.assign(depthMap);
 }
 
 std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftImageEncoded,
-                                                 const std::vector<char> &rightImageEncoded,
-                                                 int width, int height) const {
+                                                 const std::vector<char> &rightImageEncoded) const {
     cv::Mat leftImage;
     cv::Mat rightImage;
     cv::Mat depthMap;
-    cv::Size imageSize(width, height);
 
     logI(kTag, "Preparing images for depth calculation...");
 
@@ -116,8 +120,14 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
     cv::remap(leftImage, leftImage, mLeftMap.first, mLeftMap.second, cv::INTER_LINEAR);
     cv::remap(rightImage, rightImage, mRightMap.first, mRightMap.second, cv::INTER_LINEAR);
 
-    cv::resize(leftImage, leftImage, imageSize);
-    cv::resize(rightImage, rightImage, imageSize);
+    if (imageScaleFactor != 1) {
+        cv::Size imageSize(leftImage.cols * imageScaleFactor, leftImage.rows * imageScaleFactor);
+
+        logD(kTag, "Scaling images to: %i x %i", imageSize.width, imageSize.height);
+
+        cv::resize(leftImage, leftImage, imageSize);
+        cv::resize(rightImage, rightImage, imageSize);
+    }
 
     getDisparity(leftImage, rightImage, depthMap);
     getDepthFromDisparity(depthMap * disparityCorrectionFactor, depthMap);
@@ -127,14 +137,16 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
     return matToVector<float>(depthMap);
 }
 
-void DepthEstimator::setMinDisparity(int value) { minDisparity = value; }
-
 void DepthEstimator::setMaxDisparity(int value) { maxDisparity = value; }
 
 void DepthEstimator::setBlockSize(int value) { blockSize = value; }
 
-void DepthEstimator::setDisparityCorrectionFactor(float value) { disparityCorrectionFactor = value; }
+void DepthEstimator::setSpeckleWindowSize(int value) { speckleWindowSize = value; }
+
+void DepthEstimator::setMinDepth(float value) { minDepth = value; }
 
 void DepthEstimator::setMaxDepth(float value) { maxDepth = value; }
+
+void DepthEstimator::setImageScaleFactor(float value) { imageScaleFactor = value; }
 
 }  // namespace sgbmandroid

@@ -30,27 +30,31 @@ class DepthEstimator : public base_object<DepthEstimator> {
     bool calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage);
 
     std::vector<float> estimateDepth(const std::vector<char> &leftImageEncoded,
-                                     const std::vector<char> &rightImageEncoded,
-                                     int width = 640, int height = 360) const;
-
-    void setMinDisparity(int value);
+                                     const std::vector<char> &rightImageEncoded) const;
 
     void setMaxDisparity(int value);
 
     void setBlockSize(int value);
 
-    void setDisparityCorrectionFactor(float value);
+    void setSpeckleWindowSize(int value);
+
+    void setMinDepth(float value);
 
     void setMaxDepth(float value);
 
- private:
-    static constexpr char kTag[] = "DepthEstimator";
+    void setImageScaleFactor(float value);
 
-    std::pair<cv::Mat, cv::Mat> mLeftMap, mRightMap;
+ private:
+    std::pair<cv::Mat, cv::Mat> mLeftMap;
+    std::pair<cv::Mat, cv::Mat> mRightMap;
     cv::Mat mQ;
 
-    int minDisparity = 0, maxDisparity = 112, blockSize = 3;
-    float disparityCorrectionFactor = (1.0f / 16), maxDepth = 10;
+    int maxDisparity = 112;
+    int blockSize = 3;
+    int speckleWindowSize = 50;
+    float minDepth = 0;
+    float maxDepth = 10;
+    float imageScaleFactor = 1;
 
     void getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const;
 
