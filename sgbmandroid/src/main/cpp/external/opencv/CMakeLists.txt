@@ -36,9 +36,7 @@ else ()
     include(ExternalProject)
     ExternalProject_Add(
             opencv
-            GIT_REPOSITORY https://github.com/opencv/opencv.git
-            GIT_TAG ${OPENCV_VERSION}
-            UPDATE_DISCONNECTED TRUE
+            URL https://github.com/opencv/opencv/archive/refs/tags/${OPENCV_VERSION}.zip
             CMAKE_ARGS # https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
             -DBUILD_TESTS=OFF
             -DBUILD_PERF_TESTS=OFF
