@@ -28,9 +28,12 @@ int main(int argc, char *argv[]) {
     auto rImg = streamToVector(rImgStream);
 
     sgbmandroid::DepthEstimator depthEstimator(calibPath);
-    std::vector<float> depth = depthEstimator.estimateDepth(lImg, rImg);
+    auto depth = depthEstimator.estimateDepth(lImg, rImg);
 
-    for (const auto i : depth) {
-        std::cout << i << ' ';
+    for (const auto &row : depth) {
+        for (const auto point : row) {
+            std::cout << point << ' ';
+        }
+        std::cout << std::endl;
     }
 }

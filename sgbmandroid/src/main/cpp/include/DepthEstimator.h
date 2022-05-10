@@ -63,8 +63,8 @@ class DepthEstimator : public internal::base_object<DepthEstimator> {
 
     bool calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage);
 
-    std::vector<float> estimateDepth(const std::vector<char> &leftImageEncoded,
-                                     const std::vector<char> &rightImageEncoded) const;
+    std::vector<std::vector<float>> estimateDepth(const std::vector<char> &leftImageEncoded,
+                                                  const std::vector<char> &rightImageEncoded) const;
 
     void setMaxDisparity(int value);
 

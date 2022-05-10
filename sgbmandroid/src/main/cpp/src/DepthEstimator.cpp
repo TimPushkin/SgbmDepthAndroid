@@ -74,8 +74,8 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
     dst.assign(depthMap);
 }
 
-std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftImageEncoded,
-                                                 const std::vector<char> &rightImageEncoded) const {
+std::vector<std::vector<float>> DepthEstimator::estimateDepth(const std::vector<char> &leftImageEncoded,
+                                                              const std::vector<char> &rightImageEncoded) const {
     cv::Mat leftImage;
     cv::Mat rightImage;
     cv::Mat depthMap;
@@ -109,7 +109,7 @@ std::vector<float> DepthEstimator::estimateDepth(const std::vector<char> &leftIm
 
     logI(kTag, "Depth calculation finished");
 
-    return matToVector<float>(depthMap);
+    return twoDimMatToTwoDimVector<float>(depthMap);
 }
 
 void DepthEstimator::setMaxDisparity(int value) { sgbm->setNumDisparities(value - internal::minDisparity); }

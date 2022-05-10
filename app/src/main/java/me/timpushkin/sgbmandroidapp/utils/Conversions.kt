@@ -6,21 +6,26 @@ import java.nio.IntBuffer
 
 private const val TAG = "Conversions"
 
+private const val A_SH = 24 // Alpha channel shift
+private const val R_SH = 16 // Red channel shift
+private const val G_SH = 8 // Green channel shift
+private const val B_SH = 0 // Blue channel shift
+
 private const val MAX_COLOR = 0xff
+private const val MAX_A = MAX_COLOR shl A_SH
 
-fun depthArrayToBitmap(depthArray: FloatArray, width: Int, height: Int): Bitmap {
-    Log.i(
-        TAG,
-        "Converting depth array of size ${depthArray.size} " +
-            "to a Bitmap of size $width x $height = ${width * height}"
-    )
+fun depthArrayToBitmap(depthArray: Array<FloatArray>): Bitmap {
+    val width = depthArray.firstOrNull()?.size ?: 0
+    val height = depthArray.size
 
-    val max = depthArray.maxOfOrNull { it }?.coerceAtLeast(Float.MIN_VALUE) ?: Float.MIN_VALUE
-    val buffer = IntBuffer.allocate(depthArray.size).apply {
-        val alpha = MAX_COLOR shl 24
-        depthArray.forEach { depth ->
+    Log.i(TAG, "Converting depth array of size $width x $height to a Bitmap")
+
+    val flatDepthArray = depthArray.flatMap { it.toList() }
+    val max = flatDepthArray.maxOfOrNull { it } ?: Float.MIN_VALUE
+    val buffer = IntBuffer.allocate(flatDepthArray.size).apply {
+        flatDepthArray.forEach { depth ->
             val normalized = (depth.coerceAtLeast(0f) / max * MAX_COLOR).toInt()
-            put(alpha or (normalized shl 16) or (normalized shl 8) or normalized)
+            put(MAX_A or (normalized shl R_SH) or (normalized shl G_SH) or (normalized shl B_SH))
         }
         rewind()
     }

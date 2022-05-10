@@ -100,17 +100,11 @@ class MainActivity : ComponentActivity() {
     private fun getDepthMap(leftUri: Uri, rightUri: Uri): Bitmap? =
         contentResolver.openInputStream(leftUri)?.use { leftStream ->
             contentResolver.openInputStream(rightUri)?.use { rightStream ->
-                val leftImage = leftStream.readBytes()
-                val rightImage = rightStream.readBytes()
-
-                val (width, height) = BitmapFactory
-                    .decodeByteArray(leftImage, 0, leftImage.size)
-                    .run { width to height }
-
                 depthArrayToBitmap(
-                    mDepthEstimator.estimateDepth(leftImage, rightImage),
-                    width,
-                    height
+                    mDepthEstimator.estimateDepth(
+                        leftStream.readBytes(),
+                        rightStream.readBytes()
+                    )
                 ).also { bitmap -> with(mStorageUtils) { bitmap.writeToCache(CACHED_DEPTHMAP) } }
             }
         }
