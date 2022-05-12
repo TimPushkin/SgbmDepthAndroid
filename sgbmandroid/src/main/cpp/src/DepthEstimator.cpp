@@ -105,7 +105,8 @@ std::vector<std::vector<float>> DepthEstimator::estimateDepth(const std::vector<
     }
 
     getDisparity(leftImage, rightImage, depthMap);
-    getDepthFromDisparity(depthMap * internal::disparityCorrectionFactor, depthMap);
+    depthMap.convertTo(depthMap, CV_32F, internal::disparityCorrectionFactor);
+    getDepthFromDisparity(depthMap, depthMap);
 
     logI(kTag, "Depth calculation finished");
 
