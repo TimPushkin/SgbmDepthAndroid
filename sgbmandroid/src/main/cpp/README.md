@@ -32,8 +32,70 @@ method.
 The project consists of the following directories:
 
 - `examples` – usage examples (see below)
-- `include` – the directory with public headers to include when importing this CMake project
+- `external` - 3rd-party libraries
+- `include` – public headers to include when importing this CMake project
 - `src` – source code
+
+## Build
+
+This project requires [OpenCV](https://github.com/opencv/opencv) 4.5.5 or later. You can either
+manually download and install a version of OpenCV you would like to be used in the build, or run
+`BuildOpenCV.cmake` script that will download and build OpenCV for you.
+
+If you already have OpenCV, you can build this project with CMake:
+
+```shell
+cmake .          # Configure the build
+cmake --build .  # Start the build
+```
+
+### Running `BuildOpenCV.cmake`
+
+The script will download the required version of OpenCV and build it with the optimal configuration.
+OpenCV will reside in `build/opencv`, where this project will search for it first during its build.
+
+The script can be run as follows:
+
+```shell
+cmake <options> -P BuildOpenCV.cmake
+```
+
+If the project is going to be built and used on the same platform where the script is run, no
+options are required as they are going to be inferred from the system by CMake. Alternatively, if
+you plan to build it for some other platform, you can specify the following options in the form
+of `-D<variable>=<value>`:
+
+- `CMAKE_GENERATOR` -- a generator to use (for example, `Ninja`)
+- `CMAKE_TOOLCHAIN_FILE` -- path to a CMake toolchain file
+- `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` -- C/C++ compiler to use (for example, `clang`
+  /`clang++` or a path to a compiler)
+- `ANDROID_ABI` -- if building for Android, for which ABI to build (should be one of
+  the [supported ABIs](https://developer.android.com/ndk/guides/abis))
+- `ANDROID_ARM_NEON` -- if building for Android, whether to let OpenCV make use of Neon or not (`ON`
+  or `OFF`)
+
+The toolchain file specified can influence the other variables default values.
+
+For example, if you want to build for Android with ABI `armeabi-v7a` and Neon support, and you have
+NDK installed in the system, the command to run the script will be something like:
+
+```shell
+cmake -DCMAKE_GENERATOR=Ninja -DCMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" -DCMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang.exe" -DCMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++.exe" -DANDROID_ABI=armeabi-v7a -DANDROID_ARM_NEON=ON -P BuildOpenCV.cmake
+```
+
+### Generating a language interface
+
+An interface for languages like Java, Objective-C, Python, and some other can be automatically
+generated for this project. [Scapix](https://github.com/scapix-com/scapix) is used for this --
+see its page for the set of the supported languages.
+
+To generate an interface modify the configure command as follows:
+
+```shell
+cmake -DSCAPIX_BRIDGE=<language> .
+```
+
+The interface will be placed in the corresponding subdirectory of `generated` directory after the build.
 
 ## Usage examples
 
