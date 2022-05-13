@@ -3,14 +3,7 @@ set(PROJECT_BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 set(OPENCV_VERSION 4.5.5)
 set(OPENCV_DOWNLOAD_DIR ${PROJECT_BUILD_DIR}/opencv-download)
 set(OPENCV_BUILD_DIR ${PROJECT_BUILD_DIR}/opencv)
-set(OPENCV_PUBLIC_LIBRARIES opencv_core)
-set(OPENCV_PRIVATE_LIBRARIES opencv_calib3d opencv_imgproc opencv_imgcodecs opencv_flann)
-
-# Stop the script if OpenCV is already built
-# if (EXISTS ${OPENCV_BUILD_DIR}/OpenCVConfig.cmake)
-#     message(STATUS "OpenCV already built: found OpenCVConfig.cmake in ${OPENCV_BUILD_DIR}")
-#     return()
-# endif ()
+set(OPENCV_MODULES core,calib3d,imgproc,imgcodecs,flann)
 
 # Download and extract OpenCV sources
 if (NOT EXISTS ${OPENCV_DOWNLOAD_DIR}/opencv-${OPENCV_VERSION}/CMakeLists.txt)
@@ -37,14 +30,6 @@ if (NOT EXISTS ${OPENCV_DOWNLOAD_DIR}/opencv-${OPENCV_VERSION}/CMakeLists.txt)
     )
     message(STATUS "Extracting OpenCV - done")
 endif ()
-
-# Create a string of comma separated OpenCV modules to build
-foreach (OPENCV_LIB ${OPENCV_PUBLIC_LIBRARIES} ${OPENCV_PRIVATE_LIBRARIES})
-    string(REPLACE "opencv_" "" OPENCV_MODULE ${OPENCV_LIB})
-    list(APPEND OPENCV_MODULES ${OPENCV_MODULE})
-endforeach ()
-string(REPLACE ";" "," OPENCV_MODULES "${OPENCV_MODULES}")
-message(DEBUG "OpenCV modules to be build: ${OPENCV_MODULES}")
 
 # Set toolchain-related flags
 if (CMAKE_GENERATOR)
@@ -108,7 +93,6 @@ set(
         -DANDROID_ARM_NEON=${ANDROID_ARM_NEON}
         ${TOOLCHAIN_ARGS}
 )
-file(MAKE_DIRECTORY ${OPENCV_BUILD_DIR})  # TODO: check if this manual creation is necessary
 execute_process(COMMAND ${CMAKE_COMMAND} ${OPENCV_CMAKE_ARGS} -S ${OPENCV_DOWNLOAD_DIR}/opencv-${OPENCV_VERSION} -B ${OPENCV_BUILD_DIR})
 message(STATUS "Configuring OpenCV build - done")
 
