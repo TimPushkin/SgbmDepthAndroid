@@ -7,6 +7,8 @@ plugins {
 android {
     compileSdk 31
 
+    namespace 'me.timpushkin.sgbmandroidapp'
+
     defaultConfig {
         applicationId "me.timpushkin.sgbmandroidapp"
         minSdk 21
