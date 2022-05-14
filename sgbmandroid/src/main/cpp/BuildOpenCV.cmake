@@ -1,9 +1,14 @@
 set(PROJECT_BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 
 set(OPENCV_VERSION 4.5.5)
-set(OPENCV_DOWNLOAD_DIR ${PROJECT_BUILD_DIR}/opencv-download)
-set(OPENCV_BUILD_DIR ${PROJECT_BUILD_DIR}/opencv)
 set(OPENCV_MODULES core,calib3d,imgproc,imgcodecs,flann)
+set(OPENCV_DOWNLOAD_DIR ${PROJECT_BUILD_DIR}/opencv-download)
+set(OPENCV_BUILD_DIR ${PROJECT_BUILD_DIR}/opencv-build)
+
+# Append suffix to the build directory name
+if (BUILD_DIR_SUFFIX)
+    string(APPEND OPENCV_BUILD_DIR "-${BUILD_DIR_SUFFIX}")
+endif ()
 
 # Download and extract OpenCV sources
 if (NOT EXISTS ${OPENCV_DOWNLOAD_DIR}/opencv-${OPENCV_VERSION}/CMakeLists.txt)

@@ -39,20 +39,22 @@ The project consists of the following directories:
 ## Build
 
 This project requires [OpenCV](https://github.com/opencv/opencv) 4.5.5 or later. You can either
-manually download and install a version of OpenCV you would like to be used in the build, or run
-`BuildOpenCV.cmake` script that will download and build OpenCV for you.
+manually download and install it, or run `BuildOpenCV.cmake` script that will download and build
+OpenCV for you.
 
 If you already have OpenCV, you can build this project with CMake:
 
 ```shell
+# In this project's root directory (where the top level CMakeLists.txt is)
 cmake .          # Configure the build
 cmake --build .  # Start the build
 ```
 
-### Running `BuildOpenCV.cmake`
+### Running OpenCV build script
 
-The script will download the required version of OpenCV and build it with the optimal configuration.
-OpenCV will reside in `build/opencv`, where this project will search for it first during its build.
+`BuildOpenCV.cmake` can download the required version of OpenCV and build it with the optimal
+configuration. OpenCV will then reside in `build/opencv-build-<optional suffix>`, where this project
+will search for it first.
 
 The script can be run as follows:
 
@@ -60,11 +62,11 @@ The script can be run as follows:
 cmake <options> -P BuildOpenCV.cmake
 ```
 
-If the project is going to be built and used on the same platform where the script is run, no
-options are required as they are going to be inferred from the system by CMake. Alternatively, if
-you plan to build it for some other platform, you can specify the following options in the form
-of `-D<variable>=<value>`:
+In most cases no options are needed, as they are going to be inferred from the system by CMake. But
+if you plan to build the project for some other platform, you might need to specify the following
+options in the form of `-D<variable>=<value>`:
 
+- `BUILD_DIR_SUFFIX` -- suffix to append to OpenCV build directory name (defaults to empty string)
 - `CMAKE_GENERATOR` -- a generator to use (for example, `Ninja`)
 - `CMAKE_TOOLCHAIN_FILE` -- path to a CMake toolchain file
 - `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` -- C/C++ compiler to use (for example, `clang`
@@ -76,26 +78,27 @@ of `-D<variable>=<value>`:
 
 The toolchain file specified can influence the other variables default values.
 
-For example, if you want to build for Android with ABI `armeabi-v7a` and Neon support, and you have
-NDK installed in the system, the command to run the script will be something like:
+For example, if you want to build for Android with ABI `armeabi-v7a` and Neon support, having NDK
+installed in the system, the command to run the script will be something like:
 
 ```shell
-cmake -DCMAKE_GENERATOR=Ninja -DCMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" -DCMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang.exe" -DCMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++.exe" -DANDROID_ABI=armeabi-v7a -DANDROID_ARM_NEON=ON -P BuildOpenCV.cmake
+cmake -DCMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" -DCMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang.exe" -DCMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++.exe" -DANDROID_ABI=armeabi-v7a -DANDROID_ARM_NEON=ON -P BuildOpenCV.cmake
 ```
 
 ### Generating a language interface
 
-An interface for languages like Java, Objective-C, Python, and some other can be automatically
-generated for this project. [Scapix](https://github.com/scapix-com/scapix) is used for this --
-see its page for the set of the supported languages.
-
-To generate an interface modify the configure command as follows:
+To generate an interface for Java, Objective-C, Python, and some other languages modify the
+configure command as follows:
 
 ```shell
 cmake -DSCAPIX_BRIDGE=<language> .
 ```
 
-The interface will be placed in the corresponding subdirectory of `generated` directory after the build.
+[Scapix](https://github.com/scapix-com/scapix) is used for this -- see its page for the set of the
+supported languages.
+
+The interface will be placed in the corresponding subdirectory of `generated` directory after the
+build.
 
 ## Usage examples
 
