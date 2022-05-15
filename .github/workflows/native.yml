@@ -25,7 +25,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-v3
+          key: ${{runner.os}}-build-cache-v4
+
+      - name: Prepare OpenCV
+        run: cmake -P BuildOpenCV.cmake
 
       - name: Configure CMake
         run: cmake -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
@@ -51,7 +54,10 @@ jobs:
           path: |
             ~/.cmodule
             ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-bridge
+          key: ${{runner.os}}-build-cache-bridge-v2
+
+      - name: Prepare OpenCV
+        run: cmake -P BuildOpenCV.cmake
 
       - name: Configure CMake
         run: cmake -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSCAPIX_BRIDGE=java
@@ -70,7 +76,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-v3
+          key: ${{runner.os}}-build-cache-v4
 
       - name: Configure linters
         run: |
