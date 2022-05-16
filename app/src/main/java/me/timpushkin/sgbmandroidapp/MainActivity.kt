@@ -4,16 +4,20 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -47,13 +51,15 @@ class MainActivity : ComponentActivity() {
                 val scope = rememberCoroutineScope()
                 val scaffoldState = rememberScaffoldState()
                 var depthMap by remember { mutableStateOf(cachedDepthMap) }
-                var canEstimateDepth by remember {
-                    mutableStateOf(this::mDepthEstimator.isInitialized)
-                }
+                var calculationTimeNanos by rememberSaveable { mutableStateOf<Long?>(null) }
 
                 Scaffold(
                     scaffoldState = scaffoldState,
                     bottomBar = {
+                        var canEstimateDepth by remember {
+                            mutableStateOf(this::mDepthEstimator.isInitialized)
+                        }
+
                         fun displayError(message: String) =
                             scope.launch { scaffoldState.snackbarHostState.showSnackbar(message) }
 
@@ -66,25 +72,33 @@ class MainActivity : ComponentActivity() {
                                 } ?: displayError("Cannot open calibration parameters")
                             },
                             onImagesPick = { left, right ->
-                                getDepthMap(left, right)?.let { bitmap -> depthMap = bitmap }
-                                    ?: displayError("Cannot open images")
+                                getDepthMap(left, right)?.let { (bitmap, time) ->
+                                    depthMap = bitmap
+                                    calculationTimeNanos = time
+                                } ?: displayError("Cannot open images")
                             },
                             onError = ::displayError
                         )
                     },
                     backgroundColor = MaterialTheme.colors.background
                 ) { contentPadding ->
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(contentPadding)
+                            .padding(contentPadding),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         depthMap?.let { bitmap ->
                             Image(
                                 bitmap = bitmap.asImageBitmap(),
                                 contentDescription = "Depth map",
-                                modifier = Modifier.align(Alignment.Center)
+                                modifier = Modifier.weight(1f)
                             )
+                        }
+
+                        calculationTimeNanos?.let { time ->
+                            Text(text = "Calculation time: ${time * 1e-9} sec")
                         }
                     }
                 }
@@ -97,15 +111,21 @@ class MainActivity : ComponentActivity() {
             DepthEstimator(params.path)
         }
 
-    private fun getDepthMap(leftUri: Uri, rightUri: Uri): Bitmap? =
-        contentResolver.openInputStream(leftUri)?.use { leftStream ->
-            contentResolver.openInputStream(rightUri)?.use { rightStream ->
-                depthArrayToBitmap(
-                    mDepthEstimator.estimateDepth(
-                        leftStream.readBytes(),
-                        rightStream.readBytes()
-                    )
-                ).also { bitmap -> with(mStorageUtils) { bitmap.writeToCache(CACHED_DEPTHMAP) } }
-            }
-        }
+    private fun getDepthMap(leftUri: Uri, rightUri: Uri): Pair<Bitmap, Long>? {
+        val (leftBytes, rightBytes) =
+            contentResolver.openInputStream(leftUri)?.use { leftStream ->
+                contentResolver.openInputStream(rightUri)?.use { rightStream ->
+                    leftStream.readBytes() to rightStream.readBytes()
+                }
+            } ?: return null
+
+        val startTimeNanos = SystemClock.elapsedRealtimeNanos()
+        val depthArray = mDepthEstimator.estimateDepth(leftBytes, rightBytes)
+        val calculationTimeNanos = SystemClock.elapsedRealtimeNanos() - startTimeNanos
+
+        val depthMap = depthArrayToBitmap(depthArray)
+        with(mStorageUtils) { depthMap.writeToCache(CACHED_DEPTHMAP) }
+
+        return depthMap to calculationTimeNanos
+    }
 }
