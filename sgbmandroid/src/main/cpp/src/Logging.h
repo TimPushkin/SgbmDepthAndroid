@@ -1,11 +1,11 @@
 #ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
 #define SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
 
+#ifndef NDEBUG
+
 #if __has_include(<android/log.h>)
 
 #include <android/log.h>
-
-// TODO(TimPushkin): find way to fix vararg passing
 
 void logV(const char *tag, const char *format...) {
     std::va_list args;
@@ -89,5 +89,19 @@ void logE(const char *tag, const char *format...) {
 }
 
 #endif
+
+#else
+
+void logV(const char *tag, const char *format...) {}
+
+void logD(const char *tag, const char *format...) {}
+
+void logI(const char *tag, const char *format...) {}
+
+void logW(const char *tag, const char *format...) {}
+
+void logE(const char *tag, const char *format...) {}
+
+#endif  // NDEBUG
 
 #endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
