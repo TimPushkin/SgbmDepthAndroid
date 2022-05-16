@@ -65,8 +65,12 @@ jobs:
         working-directory: ${{env.NATIVE_PROJECT_SUBDIR}}
         run: |
           for ABI in $ABIS; do
-            echo "Preparing OpenCV for $ABI"
-            cmake -DCMAKE_TOOLCHAIN_FILE="$NDK/$TOOLCHAIN_SUBPATH" -DCMAKE_C_COMPILER="$NDK/$C_COMPILER_SUBPATH" -DCMAKE_CXX_COMPILER="$NDK/$CXX_COMPILER_SUBPATH" -DANDROID_ABI=$ABI -DBUILD_DIR_SUFFIX=$ABI -P BuildOpenCV.cmake
+            if [ ! -f "${{env.BUILD_SUBDIR}}/opencv-build-$ABI/OpenCVConfig.cmake" ]; then
+              echo "Preparing OpenCV for $ABI"
+              cmake -DCMAKE_TOOLCHAIN_FILE="$NDK/$TOOLCHAIN_SUBPATH" -DCMAKE_C_COMPILER="$NDK/$C_COMPILER_SUBPATH" -DCMAKE_CXX_COMPILER="$NDK/$CXX_COMPILER_SUBPATH" -DANDROID_ABI=$ABI -DBUILD_DIR_SUFFIX=$ABI -DADD_ANDROID_ABI_CHECK=ON -P BuildOpenCV.cmake
+            else
+              echo "OpenCV for $ABI already prepared"
+            fi
           done
 
       - name: Grant execute permission for gradlew
@@ -107,8 +111,12 @@ jobs:
         working-directory: ${{env.NATIVE_PROJECT_SUBDIR}}
         run: |
           for ABI in $ABIS; do
-            echo "Preparing OpenCV for $ABI"
-            cmake -DCMAKE_TOOLCHAIN_FILE="$NDK/$TOOLCHAIN_SUBPATH" -DCMAKE_C_COMPILER="$NDK/$C_COMPILER_SUBPATH" -DCMAKE_CXX_COMPILER="$NDK/$CXX_COMPILER_SUBPATH" -DANDROID_ABI=$ABI -DBUILD_DIR_SUFFIX=$ABI -P BuildOpenCV.cmake
+            if [ ! -f "${{env.BUILD_SUBDIR}}/opencv-build-$ABI/OpenCVConfig.cmake" ]; then
+              echo "Preparing OpenCV for $ABI"
+              cmake -DCMAKE_TOOLCHAIN_FILE="$NDK/$TOOLCHAIN_SUBPATH" -DCMAKE_C_COMPILER="$NDK/$C_COMPILER_SUBPATH" -DCMAKE_CXX_COMPILER="$NDK/$CXX_COMPILER_SUBPATH" -DANDROID_ABI=$ABI -DBUILD_DIR_SUFFIX=$ABI -DADD_ANDROID_ABI_CHECK=ON -P BuildOpenCV.cmake
+            else
+              echo "OpenCV for $ABI already prepared"
+            fi
           done
 
       - name: Grant execute permission for gradlew

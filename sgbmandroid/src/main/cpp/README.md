@@ -66,15 +66,18 @@ In most cases no options are needed, as they are going to be inferred from the s
 if you plan to build the project for some other platform, you might need to specify the following
 options in the form of `-D<variable>=<value>`:
 
-- `BUILD_DIR_SUFFIX` -- suffix to append to OpenCV build directory name (defaults to empty string)
-- `CMAKE_GENERATOR` -- a generator to use (for example, `Ninja`)
-- `CMAKE_TOOLCHAIN_FILE` -- path to a CMake toolchain file
+- `BUILD_DIR_SUFFIX` -- suffix to append to OpenCV build directory name (defaults to none)
+- `CMAKE_GENERATOR` -- a generator to use (for example, `Ninja`, defaults to system default)
+- `CMAKE_TOOLCHAIN_FILE` -- path to a CMake toolchain file (defaults to none)
 - `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` -- C/C++ compiler to use (for example, `clang`
-  /`clang++` or a path to a compiler)
+  /`clang++` or a path to a compiler, defaults to system default)
 - `ANDROID_ABI` -- if building for Android, for which ABI to build (should be one of
-  the [supported ABIs](https://developer.android.com/ndk/guides/abis))
+  the [supported ABIs](https://developer.android.com/ndk/guides/abis), defaults to the ABI from the
+  selected toolchain if any)
+- `ADD_ANDROID_ABI_CHECK` -- whether to modify `OpenCVConfig-version.cmake` with an additional check
+  for Android ABI compatibility (`ON` or `OFF`, disabled by default)
 - `ANDROID_ARM_NEON` -- if building for Android, whether to let OpenCV make use of Neon or not (`ON`
-  or `OFF`)
+  or `OFF`, disabled by default)
 
 The toolchain file specified can influence the other variables default values.
 
@@ -82,7 +85,13 @@ For example, if you want to build for Android with ABI `armeabi-v7a` and Neon su
 installed in the system, the command to run the script will be something like:
 
 ```shell
-cmake -DCMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" -DCMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang.exe" -DCMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++.exe" -DANDROID_ABI=armeabi-v7a -DANDROID_ARM_NEON=ON -P BuildOpenCV.cmake
+cmake -DCMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" \
+      -DCMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang<extension>" \
+      -DCMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++<extension>" \
+      -DANDROID_ABI=armeabi-v7a \
+      -DANDROID_ARM_NEON=ON \
+      -DADD_ANDROID_ABI_CHECK=ON \
+      -P BuildOpenCV.cmake
 ```
 
 ### Generating a language interface

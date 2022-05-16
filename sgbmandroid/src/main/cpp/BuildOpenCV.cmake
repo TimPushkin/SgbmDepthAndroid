@@ -105,3 +105,29 @@ message(STATUS "Configuring OpenCV build - done")
 message(STATUS "Building OpenCV")
 execute_process(COMMAND ${CMAKE_COMMAND} --build ${OPENCV_BUILD_DIR})
 message(STATUS "Building OpenCV - done")
+
+# Modify OpenCVConfig-version.cmake to check for Android ABI mismatch
+# We don't modify OpenCVConfig.cmake because that way CMake would still add OpenCV into a build even
+# if Android ABI is incompatible and OpenCV is considered not found
+# This implementation may produce false negative reports in stderr when OpenCV with incompatible ABI
+# is considered, stating that OpenCV could not be found
+if (ADD_ANDROID_ABI_CHECK)
+    if (ANDROID_ABI)
+        message(STATUS "Adding Android ABI check into OpenCVConfig-version.cmake")
+        file(
+                APPEND
+                ${OPENCV_BUILD_DIR}/OpenCVConfig-version.cmake
+                "
+if (ANDROID_ABI AND NOT \${ANDROID_ABI} STREQUAL ${ANDROID_ABI})
+    if (NOT OpenCV_FIND_QUIETLY)
+        message(WARNING \"Found OpenCV but it has incompatible ABI: need \${ANDROID_ABI} but found ${ANDROID_ABI}\")
+    endif ()
+    set(PACKAGE_VERSION_UNSUITABLE True)
+endif ()
+"
+        )
+        message(STATUS "Adding Android ABI check into OpenCVConfig-version.cmake - done")
+    else ()
+        message(WARNING "Cannot add Android ABI check: ANDROID_ABI is not set")
+    endif ()
+endif ()
