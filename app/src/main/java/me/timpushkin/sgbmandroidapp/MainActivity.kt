@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
 import me.timpushkin.sgbmandroid.DepthEstimator
 import me.timpushkin.sgbmandroidapp.ui.MenuButtons
+import me.timpushkin.sgbmandroidapp.ui.ScaleFactorField
 import me.timpushkin.sgbmandroidapp.utils.StorageUtils
 import me.timpushkin.sgbmandroidapp.utils.depthArrayToBitmap
 
@@ -57,16 +58,15 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 val scope = rememberCoroutineScope()
                 val scaffoldState = rememberScaffoldState()
+                var depthEstimatorReady by remember {
+                    mutableStateOf(this::mDepthEstimator.isInitialized)
+                }
+                var imagesReady by remember { mutableStateOf(mImages != null) }
                 var calculationTimeNanos by rememberSaveable { mutableStateOf<Long?>(null) }
 
                 Scaffold(
                     scaffoldState = scaffoldState,
                     bottomBar = {
-                        var depthEstimatorReady by remember {
-                            mutableStateOf(this::mDepthEstimator.isInitialized)
-                        }
-                        var imagesReady by remember { mutableStateOf(mImages != null) }
-
                         fun displayError(message: String) =
                             scope.launch { scaffoldState.snackbarHostState.showSnackbar(message) }
 
@@ -120,6 +120,10 @@ class MainActivity : ComponentActivity() {
 
                         calculationTimeNanos?.let { time ->
                             Text(text = "Calculation time: ${time * 1e-9} sec")
+                        }
+
+                        if (depthEstimatorReady && imagesReady) {
+                            ScaleFactorField { mDepthEstimator.setImageScaleFactor(it) }
                         }
                     }
                 }
