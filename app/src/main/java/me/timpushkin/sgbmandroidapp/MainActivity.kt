@@ -28,54 +28,75 @@ import me.timpushkin.sgbmandroidapp.utils.StorageUtils
 import me.timpushkin.sgbmandroidapp.utils.depthArrayToBitmap
 
 private const val CACHED_PARAMS = "params.xml"
-private const val CACHED_DEPTHMAP = "depth.png"
+private const val CACHED_LEFT_IMAGE = "left.png"
+private const val CACHED_RIGHT_IMAGE = "right.png"
+private const val CACHED_DEPTH_MAP = "depth.png"
 
 class MainActivity : ComponentActivity() {
     private lateinit var mStorageUtils: StorageUtils
     private lateinit var mDepthEstimator: DepthEstimator
 
+    private var mImages: Pair<ByteArray, ByteArray>? = null
+    private var mDepthMap by mutableStateOf<Bitmap?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mStorageUtils = StorageUtils(this)
-        mStorageUtils.getFromCache(CACHED_PARAMS)?.let { params ->
-            mDepthEstimator = DepthEstimator(params.path)
-        }
-
-        val cachedDepthMap = mStorageUtils.getFromCache(CACHED_DEPTHMAP)?.let { file ->
-            BitmapFactory.decodeFile(file.path)
+        with(mStorageUtils) {
+            getFromCache(CACHED_PARAMS)?.run { mDepthEstimator = DepthEstimator(path) }
+            getFromCache(CACHED_LEFT_IMAGE)?.let { left ->
+                getFromCache(CACHED_RIGHT_IMAGE)?.let { right ->
+                    mImages = left.readBytes() to right.readBytes()
+                }
+            }
+            getFromCache(CACHED_DEPTH_MAP)?.run { mDepthMap = BitmapFactory.decodeFile(path) }
         }
 
         setContent {
             MaterialTheme {
                 val scope = rememberCoroutineScope()
                 val scaffoldState = rememberScaffoldState()
-                var depthMap by remember { mutableStateOf(cachedDepthMap) }
                 var calculationTimeNanos by rememberSaveable { mutableStateOf<Long?>(null) }
 
                 Scaffold(
                     scaffoldState = scaffoldState,
                     bottomBar = {
-                        var canEstimateDepth by remember {
+                        var depthEstimatorReady by remember {
                             mutableStateOf(this::mDepthEstimator.isInitialized)
                         }
+                        var imagesReady by remember { mutableStateOf(mImages != null) }
 
                         fun displayError(message: String) =
                             scope.launch { scaffoldState.snackbarHostState.showSnackbar(message) }
 
                         MenuButtons(
-                            showPickImagesButton = canEstimateDepth,
+                            showPickImagesButton = depthEstimatorReady,
+                            showRunButton = depthEstimatorReady && imagesReady,
                             onParamsPick = { uri ->
-                                getDepthEstimator(uri)?.let { depthEstimator ->
-                                    mDepthEstimator = depthEstimator
-                                    canEstimateDepth = true
+                                getDepthEstimator(uri)?.let {
+                                    mDepthEstimator = it
+                                    depthEstimatorReady = true
                                 } ?: displayError("Cannot open calibration parameters")
                             },
                             onImagesPick = { left, right ->
-                                getDepthMap(left, right)?.let { (bitmap, time) ->
-                                    depthMap = bitmap
-                                    calculationTimeNanos = time
+                                with(contentResolver) {
+                                    openInputStream(left)?.use { leftStream ->
+                                        openInputStream(right)?.use { rightStream ->
+                                            leftStream.readBytes() to rightStream.readBytes()
+                                        }
+                                    }
+                                }?.let {
+                                    mImages = it
+                                    imagesReady = true
                                 } ?: displayError("Cannot open images")
+                            },
+                            onRunClick = {
+                                mImages?.let { (left, right) ->
+                                    val (bitmap, time) = getDepthMap(left, right)
+                                    mDepthMap = bitmap
+                                    calculationTimeNanos = time
+                                } ?: throw IllegalStateException("Run clicked with no images")
                             },
                             onError = ::displayError
                         )
@@ -89,9 +110,9 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        depthMap?.let { bitmap ->
+                        mDepthMap?.run {
                             Image(
-                                bitmap = bitmap.asImageBitmap(),
+                                bitmap = asImageBitmap(),
                                 contentDescription = "Depth map",
                                 modifier = Modifier.weight(1f)
                             )
@@ -107,25 +128,24 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getDepthEstimator(uri: Uri): DepthEstimator? =
-        with(mStorageUtils) { uri.copyToCache(CACHED_PARAMS) }?.let { params ->
-            DepthEstimator(params.path)
-        }
+        with(mStorageUtils) { uri.copyToCache(CACHED_PARAMS) }?.run { DepthEstimator(path) }
 
-    private fun getDepthMap(leftUri: Uri, rightUri: Uri): Pair<Bitmap, Long>? {
-        val (leftBytes, rightBytes) =
-            contentResolver.openInputStream(leftUri)?.use { leftStream ->
-                contentResolver.openInputStream(rightUri)?.use { rightStream ->
-                    leftStream.readBytes() to rightStream.readBytes()
-                }
-            } ?: return null
-
+    private fun getDepthMap(leftImage: ByteArray, rightImage: ByteArray): Pair<Bitmap, Long> {
         val startTimeNanos = SystemClock.elapsedRealtimeNanos()
-        val depthArray = mDepthEstimator.estimateDepth(leftBytes, rightBytes)
+        val depthArray = mDepthEstimator.estimateDepth(leftImage, rightImage)
         val calculationTimeNanos = SystemClock.elapsedRealtimeNanos() - startTimeNanos
+        return depthArrayToBitmap(depthArray) to calculationTimeNanos
+    }
 
-        val depthMap = depthArrayToBitmap(depthArray)
-        with(mStorageUtils) { depthMap.writeToCache(CACHED_DEPTHMAP) }
+    override fun onDestroy() {
+        super.onDestroy()
 
-        return depthMap to calculationTimeNanos
+        with(mStorageUtils) {
+            mImages?.let { (left, right) ->
+                left.writeToCache(CACHED_LEFT_IMAGE)
+                right.writeToCache(CACHED_RIGHT_IMAGE)
+            }
+            mDepthMap?.writeToCache(CACHED_DEPTH_MAP)
+        }
     }
 }

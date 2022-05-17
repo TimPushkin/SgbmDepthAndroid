@@ -26,6 +26,10 @@ class StorageUtils(private val context: Context) {
             null
         }
 
+    fun ByteArray.writeToCache(filename: String): File = File(context.cacheDir, filename).apply {
+        writeBytes(this@writeToCache)
+    }
+
     fun Bitmap.writeToCache(filename: String): File? {
         val file = File(context.cacheDir, filename)
 

@@ -18,8 +18,10 @@ private const val IMG_MIME = "image/*"
 @Composable
 fun MenuButtons(
     showPickImagesButton: Boolean,
+    showRunButton: Boolean,
     onParamsPick: (Uri) -> Unit,
     onImagesPick: (Uri, Uri) -> Unit,
+    onRunClick: () -> Unit,
     onError: (String) -> Unit
 ) {
     val paramsPicker =
@@ -51,6 +53,12 @@ fun MenuButtons(
         if (showPickImagesButton) {
             Button(onClick = { imagesPicker.launch(arrayOf(IMG_MIME)) }) {
                 Text("Load images")
+            }
+        }
+
+        if (showRunButton) {
+            Button(onClick = onRunClick) {
+                Text("Run")
             }
         }
     }
