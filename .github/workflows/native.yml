@@ -31,7 +31,10 @@ jobs:
         run: cmake -P BuildOpenCV.cmake
 
       - name: Configure CMake
-        run: cmake -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_EXAMPLES=ON
+        run: cmake -B ${{env.BUILD_SUBDIR}} \
+                   -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+                   -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                   -D BUILD_EXAMPLES=ON
 
       - name: Build
         run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
@@ -60,7 +63,9 @@ jobs:
         run: cmake -P BuildOpenCV.cmake
 
       - name: Configure CMake
-        run: cmake -B ${{env.BUILD_SUBDIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSCAPIX_BRIDGE=java
+        run: cmake -B ${{env.BUILD_SUBDIR}} \
+                   -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+                   -D SCAPIX_BRIDGE=java
 
       - name: Build
         run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
