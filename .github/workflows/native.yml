@@ -89,7 +89,7 @@ jobs:
           sudo apt-get install clang-tidy
 
       - name: Run cpplint
-        run: cpplint --recursive .
+        run: cpplint --recursive --quiet .
 
       - name: Run clang-tidy
         run: run-clang-tidy -p ${{env.BUILD_SUBDIR}}
