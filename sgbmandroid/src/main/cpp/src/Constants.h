@@ -1,5 +1,5 @@
-#ifndef SGBMANDROID_SRC_MAIN_CPP_INCLUDE_CONSTANTS_H_
-#define SGBMANDROID_SRC_MAIN_CPP_INCLUDE_CONSTANTS_H_
+#ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_CONSTANTS_H_
+#define SGBMANDROID_SRC_MAIN_CPP_SRC_CONSTANTS_H_
 
 namespace sgbmandroid {
 
@@ -29,4 +29,4 @@ constexpr auto disparityCorrectionFactor = 1.0F / 16;
 
 }  // namespace sgbmandroid
 
-#endif  // SGBMANDROID_SRC_MAIN_CPP_INCLUDE_CONSTANTS_H_
+#endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_CONSTANTS_H_
