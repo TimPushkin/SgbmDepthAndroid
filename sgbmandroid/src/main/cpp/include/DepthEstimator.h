@@ -100,6 +100,12 @@ class DepthEstimator : public internal::base_object<DepthEstimator> {
     float maxDepth = 10;
     float imageScaleFactor = 1;
 
+    enum StereoPairMember {
+        LEFT, RIGHT
+    };
+
+    void prepareImage(cv::InputArray imageEncoded, cv::OutputArray dst, StereoPairMember stereoPairMember) const;
+
     void getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const;
 
     void getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const;

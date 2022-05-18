@@ -1,3 +1,4 @@
+#include <future>
 #include "opencv2/calib3d.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
@@ -46,6 +47,28 @@ bool DepthEstimator::calibrate(const std::vector<char> &leftImage, const std::ve
     return true;
 }
 
+void DepthEstimator::prepareImage(cv::InputArray imageEncoded, cv::OutputArray dst,
+                                  StereoPairMember stereoPairMember) const {
+    cv::Mat image = cv::imdecode(imageEncoded, cv::IMREAD_COLOR);
+    logD(kTag, "Loaded image of size %i x %i", image.cols, image.rows);
+
+    switch (stereoPairMember) {
+        case StereoPairMember::LEFT:
+            cv::remap(image, image, mLeftMap.first, mLeftMap.second, cv::INTER_LINEAR);
+        case StereoPairMember::RIGHT:
+            cv::remap(image, image, mRightMap.first, mRightMap.second, cv::INTER_LINEAR);
+    }
+
+    if (imageScaleFactor != 1) {
+        cv::Size targetSize(static_cast<int> (static_cast<float> (image.cols) * imageScaleFactor),
+                            static_cast<int> (static_cast<float> (image.rows) * imageScaleFactor));
+        logD(kTag, "Scaling image to %i x %i...", targetSize.width, targetSize.height);
+        cv::resize(image, image, targetSize);
+    }
+
+    dst.assign(image);
+}
+
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
     logI(kTag, "Computing disparity...");
 
@@ -82,27 +105,16 @@ std::vector<std::vector<float>> DepthEstimator::estimateDepth(const std::vector<
 
     logI(kTag, "Preparing images for depth calculation...");
 
-    leftImage = cv::imdecode(leftImageEncoded, cv::IMREAD_COLOR);
-    rightImage = cv::imdecode(rightImageEncoded, cv::IMREAD_COLOR);
+    auto leftImageFuture = std::async(&DepthEstimator::prepareImage, this,
+                                      std::ref(static_cast<cv::InputArray>(leftImageEncoded)),
+                                      std::ref(static_cast<cv::OutputArray>(leftImage)), StereoPairMember::LEFT);
+    auto rightImageFuture = std::async(&DepthEstimator::prepareImage, this,
+                                       std::ref(static_cast<cv::InputArray>(rightImageEncoded)),
+                                       std::ref(static_cast<cv::OutputArray>(rightImage)), StereoPairMember::RIGHT);
+    leftImageFuture.wait();
+    rightImageFuture.wait();
 
-    logD(kTag, "Loaded images:\n"
-               "- Left image has size %i x %i\n"
-               "- Right image has size %i x %i",
-         leftImage.cols, leftImage.rows,
-         rightImage.cols, rightImage.rows);
-
-    cv::remap(leftImage, leftImage, mLeftMap.first, mLeftMap.second, cv::INTER_LINEAR);
-    cv::remap(rightImage, rightImage, mRightMap.first, mRightMap.second, cv::INTER_LINEAR);
-
-    if (imageScaleFactor != 1) {
-        cv::Size imageSize(static_cast<int> (static_cast<float> (leftImage.cols) * imageScaleFactor),
-                           static_cast<int> (static_cast<float> (leftImage.rows) * imageScaleFactor));
-
-        logD(kTag, "Scaling images to: %i x %i", imageSize.width, imageSize.height);
-
-        cv::resize(leftImage, leftImage, imageSize);
-        cv::resize(rightImage, rightImage, imageSize);
-    }
+    logI(kTag, "Images prepared");
 
     getDisparity(leftImage, rightImage, depthMap);
     depthMap.convertTo(depthMap, CV_32F, internal::disparityCorrectionFactor);
