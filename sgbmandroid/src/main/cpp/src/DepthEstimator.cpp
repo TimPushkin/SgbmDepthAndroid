@@ -10,8 +10,6 @@ namespace sgbmandroid {
 constexpr auto kTag = "DepthEstimator";
 
 DepthEstimator::DepthEstimator(const std::string &calibPath) {
-    // TODO(TimPushkin): call calibrate
-
     logI(kTag, "Loading calibration parameters from %s...", calibPath.c_str());
 
     cv::FileStorage fs(calibPath, cv::FileStorage::READ);
@@ -38,12 +36,6 @@ DepthEstimator::DepthEstimator(const std::string &calibPath) {
          mRightMap.first.cols, mRightMap.first.rows,
          mRightMap.second.cols, mRightMap.second.rows,
          mQ.cols, mQ.rows);
-}
-
-// NOLINTNEXTLINE
-bool DepthEstimator::calibrate(const std::vector<char> &leftImage, const std::vector<char> &rightImage) {
-    // TODO(TimPushkin): fill calibration parameters
-    return true;
 }
 
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
