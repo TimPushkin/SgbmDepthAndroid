@@ -64,6 +64,8 @@ class DepthEstimator : public internal::base_object<DepthEstimator> {
     std::pair<cv::Mat, cv::Mat> mLeftMap;
     std::pair<cv::Mat, cv::Mat> mRightMap;
     cv::Mat mQ;
+    cv::Mat mScaleDependentQCol;
+    cv::Mat mUnscaledScaleDependentQCol;
 
     cv::Ptr<cv::StereoSGBM> sgbm = cv::StereoSGBM::create(
             internal::minDisparity,

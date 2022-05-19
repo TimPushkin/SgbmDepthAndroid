@@ -24,6 +24,7 @@ constexpr auto imageScaleFactor = 1;
 
 // DepthEstimator operations
 constexpr auto disparityCorrectionFactor = 1.0F / 16;
+constexpr auto scaleDependentQColIndex = 3;
 
 }  // namespace internal
 

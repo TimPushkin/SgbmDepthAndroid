@@ -36,6 +36,10 @@ DepthEstimator::DepthEstimator(const std::string &calibPath) {
          mRightMap.first.cols, mRightMap.first.rows,
          mRightMap.second.cols, mRightMap.second.rows,
          mQ.cols, mQ.rows);
+
+    mScaleDependentQCol = mQ.col(internal::scaleDependentQColIndex);
+    mScaleDependentQCol.copyTo(mUnscaledScaleDependentQCol);
+    mScaleDependentQCol * imageScaleFactor;
 }
 
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
@@ -119,6 +123,10 @@ void DepthEstimator::setMinDepth(float value) { minDepth = value; }
 
 void DepthEstimator::setMaxDepth(float value) { maxDepth = value; }
 
-void DepthEstimator::setImageScaleFactor(float value) { imageScaleFactor = value; }
+void DepthEstimator::setImageScaleFactor(float value) {
+    imageScaleFactor = value;
+    mUnscaledScaleDependentQCol.copyTo(mScaleDependentQCol);
+    mScaleDependentQCol *= value;
+}
 
 }  // namespace sgbmandroid
