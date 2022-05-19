@@ -9,6 +9,8 @@ import me.timpushkin.sgbmandroid.DepthEstimator
 
 class AppState : ViewModel() {
     var depthEstimator by mutableStateOf<DepthEstimator?>(null)
+    var scaleFactor = 1.0f
+
     var images by mutableStateOf<Pair<ByteArray, ByteArray>?>(null)
     var depthMap by mutableStateOf<Bitmap?>(null)
     var calculationTimeNanos by mutableStateOf<Long?>(null)

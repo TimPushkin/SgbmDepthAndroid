@@ -63,10 +63,11 @@ class MainActivity : ComponentActivity() {
                                     ?: displayError("Cannot open images")
                             },
                             onScaleFactorSet = { scaleFactor ->
-                                appState.depthEstimator?.run { setImageScaleFactor(scaleFactor) }
+                                appState.depthEstimator?.setImageScaleFactor(scaleFactor)
                                     ?: throw IllegalStateException(
                                         "Scale factor set with no DepthEstimator"
                                     )
+                                appState.scaleFactor = scaleFactor
                             },
                             onRunClick = {
                                 appState.images?.let { (left, right) ->
@@ -91,7 +92,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getDepthEstimator(uri: Uri): DepthEstimator? =
-        mStorageUtils.copyToCache(uri, CACHED_PARAMS)?.let { params -> DepthEstimator(params.path) }
+        mStorageUtils.copyToCache(uri, CACHED_PARAMS)?.let { params ->
+            DepthEstimator(params.path).apply { setImageScaleFactor(appState.scaleFactor) }
+        }
 
     private fun getDepthMap(leftImage: ByteArray, rightImage: ByteArray): Pair<Bitmap, Long> {
         appState.depthEstimator?.run {
