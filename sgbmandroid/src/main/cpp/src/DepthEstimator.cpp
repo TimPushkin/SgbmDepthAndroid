@@ -39,7 +39,7 @@ DepthEstimator::DepthEstimator(const std::string &calibPath) {
 
     mScaleDependentQCol = mQ.col(internal::scaleDependentQColIndex);
     mScaleDependentQCol.copyTo(mUnscaledScaleDependentQCol);
-    mScaleDependentQCol * imageScaleFactor;
+    mScaleDependentQCol * mImageScaleFactor;
 }
 
 void DepthEstimator::getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const {
@@ -64,7 +64,7 @@ void DepthEstimator::getDepthFromDisparity(cv::InputArray disparity, cv::OutputA
 
     depthMap.create(image3d.size(), CV_32FC1);
     image3d.forEach<cv::Point3f>([&](cv::Point3f &point, const int *pos) -> void {
-        depthMap.at<float>(pos[0], pos[1]) = minDepth <= point.z && point.z <= maxDepth ? point.z : 0;
+        depthMap.at<float>(pos[0], pos[1]) = mMinDepth <= point.z && point.z <= mMaxDepth ? point.z : 0;
     });
 
     dst.assign(depthMap);
@@ -90,9 +90,9 @@ std::vector<std::vector<float>> DepthEstimator::estimateDepth(const std::vector<
     cv::remap(leftImage, leftImage, mLeftMap.first, mLeftMap.second, cv::INTER_LINEAR);
     cv::remap(rightImage, rightImage, mRightMap.first, mRightMap.second, cv::INTER_LINEAR);
 
-    if (imageScaleFactor != 1) {
-        cv::Size imageSize(static_cast<int> (static_cast<float> (leftImage.cols) * imageScaleFactor),
-                           static_cast<int> (static_cast<float> (leftImage.rows) * imageScaleFactor));
+    if (mImageScaleFactor != 1) {
+        cv::Size imageSize(static_cast<int> (static_cast<float> (leftImage.cols) * mImageScaleFactor),
+                           static_cast<int> (static_cast<float> (leftImage.rows) * mImageScaleFactor));
 
         logD(kTag, "Scaling images to: %i x %i", imageSize.width, imageSize.height);
 
@@ -109,7 +109,11 @@ std::vector<std::vector<float>> DepthEstimator::estimateDepth(const std::vector<
     return twoDimMatToTwoDimVector<float>(depthMap);
 }
 
-void DepthEstimator::setMaxDisparity(int value) { sgbm->setNumDisparities(value - internal::minDisparity); }
+void DepthEstimator::setMaxDisparity(int value) {
+    auto floatValue = static_cast<float> (value);
+    mUnscaledMaxDisparity = floatValue;
+    sgbm->setNumDisparities(static_cast<int> (floatValue * mImageScaleFactor) - internal::minDisparity);
+}
 
 void DepthEstimator::setBlockSize(int value) {
     sgbm->setBlockSize(value);
@@ -119,14 +123,19 @@ void DepthEstimator::setBlockSize(int value) {
 
 void DepthEstimator::setSpeckleWindowSize(int value) { sgbm->setSpeckleWindowSize(value); }
 
-void DepthEstimator::setMinDepth(float value) { minDepth = value; }
+void DepthEstimator::setMinDepth(float value) { mMinDepth = value; }
 
-void DepthEstimator::setMaxDepth(float value) { maxDepth = value; }
+void DepthEstimator::setMaxDepth(float value) { mMaxDepth = value; }
 
 void DepthEstimator::setImageScaleFactor(float value) {
-    imageScaleFactor = value;
+    mImageScaleFactor = value;
+
+    // Correct Q matrix
     mUnscaledScaleDependentQCol.copyTo(mScaleDependentQCol);
     mScaleDependentQCol *= value;
+
+    // Correct max disparity
+    sgbm->setNumDisparities(static_cast<int> (mUnscaledMaxDisparity * value) - internal::minDisparity);
 }
 
 }  // namespace sgbmandroid

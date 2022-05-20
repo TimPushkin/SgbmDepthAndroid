@@ -67,9 +67,14 @@ class DepthEstimator : public internal::base_object<DepthEstimator> {
     cv::Mat mScaleDependentQCol;
     cv::Mat mUnscaledScaleDependentQCol;
 
+    float mUnscaledMaxDisparity = internal::maxDisparity;
+    float mMinDepth = internal::minDepth;
+    float mMaxDepth = internal::maxDepth;
+    float mImageScaleFactor = internal::imageScaleFactor;
+
     cv::Ptr<cv::StereoSGBM> sgbm = cv::StereoSGBM::create(
             internal::minDisparity,
-            internal::maxDisparity - internal::minDisparity,
+            static_cast<int> (mUnscaledMaxDisparity * mImageScaleFactor) - internal::minDisparity,
             internal::blockSize,
             internal::p1Multiplier * internal::blockSize * internal::blockSize,
             internal::p2Multiplier * internal::blockSize * internal::blockSize,
@@ -79,10 +84,6 @@ class DepthEstimator : public internal::base_object<DepthEstimator> {
             internal::speckleWindowSize,
             internal::speckleRange,
             cv::StereoSGBM::MODE_SGBM_3WAY);
-
-    float minDepth = internal::minDepth;
-    float maxDepth = internal::maxDepth;
-    float imageScaleFactor = internal::imageScaleFactor;
 
     void getDisparity(cv::InputArray leftImage, cv::InputArray rightImage, cv::OutputArray dst) const;
 
