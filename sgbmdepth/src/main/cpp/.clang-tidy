@@ -1,0 +1,2 @@
+Checks: 'android-*,bugprone-*,google-*,modernize-*,performance-*,portatibility-*,readability-*'
+WarningsAsErrors: 'android-*,bugprone-*,clang-analyzer-*,google-*,performance-*,portatibility-*,readability-*'

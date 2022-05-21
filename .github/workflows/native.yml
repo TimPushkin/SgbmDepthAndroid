@@ -1,0 +1,97 @@
+name: Native
+
+on: [ push, workflow_dispatch ]
+
+env:
+  BUILD_TYPE: Debug
+  PROJECT_SUBDIR: sgbmdepth/src/main/cpp
+  BUILD_SUBDIR: build
+
+defaults:
+  run:
+    shell: bash
+    working-directory: sgbmdepth/src/main/cpp  # Must be the same as env.PROJECT_SUBDIR
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: hendrikmuhs/ccache-action@v1.2
+
+      - name: Cache build artifacts
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
+          key: ${{runner.os}}-build-cache-v5
+
+      - name: Prepare OpenCV
+        run: cmake -P BuildOpenCV.cmake
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{env.BUILD_SUBDIR}} \
+                -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+                -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                -D BUILD_EXAMPLES=ON
+
+      - name: Build
+        run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
+
+  build-java-bridge:
+    runs-on: ubuntu-latest
+
+    env:
+      CC: clang
+      CXX: clang++
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: hendrikmuhs/ccache-action@v1.2
+
+      - name: Cache build artifacts
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cmodule
+            ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
+          key: ${{runner.os}}-build-cache-bridge
+
+      - name: Prepare OpenCV
+        run: cmake -P BuildOpenCV.cmake
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{env.BUILD_SUBDIR}} \
+                -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+                -D SCAPIX_BRIDGE=java
+
+      - name: Build
+        run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache build artifacts
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
+          key: ${{runner.os}}-build-cache-v5
+
+      - name: Configure linters
+        run: |
+          pip install cpplint
+          sudo apt-get install clang-tidy
+
+      - name: Run cpplint
+        run: cpplint --recursive --quiet .
+
+      - name: Run clang-tidy
+        run: run-clang-tidy -p ${{env.BUILD_SUBDIR}}
