@@ -91,11 +91,26 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Creates an instance of [DepthEstimator] from the calibration parameters pointed by the
+     * provided [Uri].
+     * Returns an instance of [DepthEstimator] if the calibration parameters were successfully
+     * loaded or null otherwise.
+     *
+     * @param uri a file containing calibration parameters.
+     */
     private fun getDepthEstimator(uri: Uri): DepthEstimator? =
         mStorageUtils.copyToCache(uri, CACHED_PARAMS)?.let { params ->
             DepthEstimator(params.path).apply { setImageScaleFactor(appState.scaleFactor) }
         }
 
+    /**
+     * Computes a depth map from an image pair. Returns the depth map and the time it took to
+     * compute in nanoseconds.
+     *
+     * @param leftImage the left image of the image pair.
+     * @param rightImage the right image of the image pair.
+     */
     private fun getDepthMap(leftImage: ByteArray, rightImage: ByteArray): Pair<Bitmap, Long> {
         appState.depthEstimator?.run {
             val startTimeNanos = SystemClock.elapsedRealtimeNanos()
