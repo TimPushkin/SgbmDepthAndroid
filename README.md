@@ -1,4 +1,4 @@
-# SgbmDepth
+# SgbmDepth Android
 
 Android library for depth estimation based on
 [StereoSGBM](https://docs.opencv.org/4.5.5/d2/d85/classcv_1_1StereoSGBM.html) from OpenCV.
