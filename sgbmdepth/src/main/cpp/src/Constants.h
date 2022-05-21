@@ -1,7 +1,7 @@
-#ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_CONSTANTS_H_
-#define SGBMANDROID_SRC_MAIN_CPP_SRC_CONSTANTS_H_
+#ifndef SGBMDEPTH_SRC_MAIN_CPP_SRC_CONSTANTS_H_
+#define SGBMDEPTH_SRC_MAIN_CPP_SRC_CONSTANTS_H_
 
-namespace sgbmandroid {
+namespace sgbmdepth {
 
 namespace internal {
 
@@ -28,6 +28,6 @@ constexpr auto scaleDependentQColIndex = 3;
 
 }  // namespace internal
 
-}  // namespace sgbmandroid
+}  // namespace sgbmdepth
 
-#endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_CONSTANTS_H_
+#endif  // SGBMDEPTH_SRC_MAIN_CPP_SRC_CONSTANTS_H_

@@ -1,5 +1,5 @@
-#ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
-#define SGBMANDROID_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
+#ifndef SGBMDEPTH_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
+#define SGBMDEPTH_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
 
 #include <vector>
 #include "opencv2/core.hpp"
@@ -29,4 +29,4 @@ std::vector<std::vector<T>> twoDimMatToTwoDimVector(const cv::Mat &mat) {
     return result;
 }
 
-#endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_CONVERSIONS_H_
+#endif  // SGBMDEPTH_SRC_MAIN_CPP_SRC_CONVERSIONS_H_

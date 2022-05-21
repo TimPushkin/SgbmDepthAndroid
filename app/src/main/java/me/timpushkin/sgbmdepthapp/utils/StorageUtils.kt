@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroidapp.utils
+package me.timpushkin.sgbmdepthapp.utils
 
 import android.content.Context
 import android.net.Uri

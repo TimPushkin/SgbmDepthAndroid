@@ -5,7 +5,7 @@
 #include "Conversions.h"
 #include "Logging.h"
 
-namespace sgbmandroid {
+namespace sgbmdepth {
 
 constexpr auto kTag = "DepthEstimator";
 
@@ -138,4 +138,4 @@ void DepthEstimator::setImageScaleFactor(float value) {
     sgbm->setNumDisparities(static_cast<int> (mUnscaledMaxDisparity * value) - internal::minDisparity);
 }
 
-}  // namespace sgbmandroid
+}  // namespace sgbmdepth

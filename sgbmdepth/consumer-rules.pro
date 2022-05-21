@@ -16,4 +16,4 @@
 }
 
 # ProGuard might remove DepthEstimator otherwise
--keep class me.timpushkin.sgbmandroid.DepthEstimator { *; }
+-keep class me.timpushkin.sgbmdepth.DepthEstimator { *; }

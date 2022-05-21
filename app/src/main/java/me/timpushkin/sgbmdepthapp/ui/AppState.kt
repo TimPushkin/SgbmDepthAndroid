@@ -1,11 +1,11 @@
-package me.timpushkin.sgbmandroidapp.ui
+package me.timpushkin.sgbmdepthapp.ui
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import me.timpushkin.sgbmandroid.DepthEstimator
+import me.timpushkin.sgbmdepth.DepthEstimator
 
 class AppState : ViewModel() {
     var depthEstimator by mutableStateOf<DepthEstimator?>(null)

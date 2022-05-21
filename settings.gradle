@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SgbmAndroid"
-include ':app', ':sgbmandroid'
+rootProject.name = "SgbmDepthAndroid"
+include ':app', ':sgbmdepth'

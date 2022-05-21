@@ -19,7 +19,7 @@ if (DEFINED SCAPIX_BRIDGE)
 
     find_package(Scapix REQUIRED)
 
-    scapix_bridge_headers(${PROJECT_NAME} me.timpushkin.sgbmandroid ${HEADER_FILES})
+    scapix_bridge_headers(${PROJECT_NAME} me.timpushkin.sgbmdepth ${HEADER_FILES})
 
     message(STATUS "Configuring Scapix - done")
 endif ()

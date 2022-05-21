@@ -3,7 +3,7 @@ name: Android
 on: [ push, workflow_dispatch ]
 
 env:
-  NATIVE_PROJECT_SUBDIR: sgbmandroid/src/main/cpp
+  NATIVE_PROJECT_SUBDIR: sgbmdepth/src/main/cpp
   BUILD_SUBDIR: build
   ABIS: "armeabi-v7a arm64-v8a x86 x86_64"
   TOOLCHAIN_SUBPATH: build/cmake/android.toolchain.cmake
@@ -83,7 +83,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Android library
-        run: ./gradlew :sgbmandroid:build
+        run: ./gradlew :sgbmdepth:build
 
       - name: Build Android app
         run: ./gradlew :app:build

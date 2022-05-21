@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroidapp
+package me.timpushkin.sgbmdepthapp
 
 import android.graphics.Bitmap
 import android.net.Uri
@@ -15,12 +15,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.launch
-import me.timpushkin.sgbmandroid.DepthEstimator
-import me.timpushkin.sgbmandroidapp.ui.AppState
-import me.timpushkin.sgbmandroidapp.ui.Menu
-import me.timpushkin.sgbmandroidapp.ui.ResultsScreen
-import me.timpushkin.sgbmandroidapp.utils.StorageUtils
-import me.timpushkin.sgbmandroidapp.utils.depthArrayToBitmap
+import me.timpushkin.sgbmdepth.DepthEstimator
+import me.timpushkin.sgbmdepthapp.ui.AppState
+import me.timpushkin.sgbmdepthapp.ui.Menu
+import me.timpushkin.sgbmdepthapp.ui.ResultsScreen
+import me.timpushkin.sgbmdepthapp.utils.StorageUtils
+import me.timpushkin.sgbmdepthapp.utils.depthArrayToBitmap
 
 private const val CACHED_PARAMS = "params.xml"
 

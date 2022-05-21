@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(sgbmandroid)
+project(sgbmdepth)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 

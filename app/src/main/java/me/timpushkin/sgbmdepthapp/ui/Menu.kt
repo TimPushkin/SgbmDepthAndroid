@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroidapp.ui
+package me.timpushkin.sgbmdepthapp.ui
 
 import android.net.Uri
 import android.webkit.MimeTypeMap

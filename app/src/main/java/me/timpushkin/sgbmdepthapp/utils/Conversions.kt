@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroidapp.utils
+package me.timpushkin.sgbmdepthapp.utils
 
 import android.graphics.Bitmap
 import android.util.Log

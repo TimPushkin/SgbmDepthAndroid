@@ -1,4 +1,4 @@
-# Native core of SgbmAndroid library
+# Native core of SgbmDepth library
 
 This directory contains the native implementation of the SGBM-based depth estimation algorithm.
 

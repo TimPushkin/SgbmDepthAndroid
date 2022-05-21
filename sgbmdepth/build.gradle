@@ -6,7 +6,7 @@ android {
     compileSdk 31
     ndkVersion '23.1.7779620'
 
-    namespace 'me.timpushkin.sgbmandroid'
+    namespace 'me.timpushkin.sgbmdepth'
 
     defaultConfig {
         minSdk 21

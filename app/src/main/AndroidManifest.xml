@@ -7,9 +7,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SgbmAndroid">
+        android:theme="@style/Theme.SgbmDepthApp">
         <activity
-            android:name="me.timpushkin.sgbmandroidapp.MainActivity"
+            android:name="me.timpushkin.sgbmdepthapp.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

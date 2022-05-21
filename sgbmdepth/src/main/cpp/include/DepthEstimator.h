@@ -1,5 +1,5 @@
-#ifndef SGBMANDROID_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
-#define SGBMANDROID_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+#ifndef SGBMDEPTH_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+#define SGBMDEPTH_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
 
 #include <string>
 #include <vector>
@@ -12,7 +12,7 @@
 
 #include <scapix/bridge/object.h>
 
-namespace sgbmandroid {
+namespace sgbmdepth {
 
 namespace internal {
 
@@ -21,11 +21,11 @@ using base_object = scapix::bridge::object<T>;
 
 }  // namespace internal
 
-}  // namespace sgbmandroid
+}  // namespace sgbmdepth
 
 #else
 
-namespace sgbmandroid {
+namespace sgbmdepth {
 
 namespace internal {
 
@@ -35,11 +35,11 @@ class base_object {
 
 }  // namespace internal
 
-}  // namespace sgbmandroid
+}  // namespace sgbmdepth
 
 #endif  // SCAPIX_BRIDGE
 
-namespace sgbmandroid {
+namespace sgbmdepth {
 
 // Computes a depth map from a pair of images.
 class DepthEstimator : public internal::base_object<DepthEstimator> {
@@ -136,6 +136,6 @@ class DepthEstimator : public internal::base_object<DepthEstimator> {
     void getDepthFromDisparity(cv::InputArray disparity, cv::OutputArray dst) const;
 };
 
-}  // namespace sgbmandroid
+}  // namespace sgbmdepth
 
-#endif  // SGBMANDROID_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_
+#endif  // SGBMDEPTH_SRC_MAIN_CPP_INCLUDE_DEPTHESTIMATOR_H_

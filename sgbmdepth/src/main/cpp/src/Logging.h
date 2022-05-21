@@ -1,5 +1,5 @@
-#ifndef SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
-#define SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
+#ifndef SGBMDEPTH_SRC_MAIN_CPP_SRC_LOGGING_H_
+#define SGBMDEPTH_SRC_MAIN_CPP_SRC_LOGGING_H_
 
 #ifndef NDEBUG
 
@@ -104,4 +104,4 @@ void logE(const char *tag, const char *format...) {}
 
 #endif  // NDEBUG
 
-#endif  // SGBMANDROID_SRC_MAIN_CPP_SRC_LOGGING_H_
+#endif  // SGBMDEPTH_SRC_MAIN_CPP_SRC_LOGGING_H_

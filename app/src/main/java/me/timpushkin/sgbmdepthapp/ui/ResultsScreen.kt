@@ -1,4 +1,4 @@
-package me.timpushkin.sgbmandroidapp.ui
+package me.timpushkin.sgbmdepthapp.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
