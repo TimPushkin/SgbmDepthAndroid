@@ -25,7 +25,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache
+          key: ${{runner.os}}-build-cache-v5
 
       - name: Prepare OpenCV
         run: cmake -P BuildOpenCV.cmake
@@ -83,7 +83,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache
+          key: ${{runner.os}}-build-cache-v5
 
       - name: Configure linters
         run: |
