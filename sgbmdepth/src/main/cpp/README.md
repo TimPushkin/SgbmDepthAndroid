@@ -50,6 +50,10 @@ cmake .          # Configure the build
 cmake --build .  # Start the build
 ```
 
+*Note*: when building on Windows, you may be required to specify a non-default generator, for
+example, `ninja`, with `-DCMAKE_GENERATOR=<generator name>` in the configuration command, because
+Windows' default generator `nmake` seems to fail.
+
 ### Running OpenCV build script
 
 `BuildOpenCV.cmake` can download the required version of OpenCV and build it with the optimal
