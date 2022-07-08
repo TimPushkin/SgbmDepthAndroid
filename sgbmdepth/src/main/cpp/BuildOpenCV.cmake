@@ -50,6 +50,14 @@ if (CMAKE_CXX_COMPILER)
     list(APPEND TOOLCHAIN_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER})
 endif ()
 
+# Set Android-related flags
+if (ANDROID_ABI)
+    list(APPEND ANDROID_ARGS -DANDROID_ABI=${ANDROID_ABI})
+endif ()
+if (ANDROID_ARM_NEON)
+    list(APPEND ANDROID_ARGS -DANDROID_ARM_NEON=${ANDROID_ARM_NEON})
+endif ()
+
 # Configure OpenCV build
 set(
         OPENCV_CMAKE_ARGS  # https://docs.opencv.org/4.5.5/db/d05/tutorial_config_reference.html
@@ -94,9 +102,8 @@ set(
         -DWITH_IPP=ON
         # Cross-compilation handling
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-        -DANDROID_ABI=${ANDROID_ABI}
-        -DANDROID_ARM_NEON=${ANDROID_ARM_NEON}
         ${TOOLCHAIN_ARGS}
+        ${ANDROID_ARGS}
 )
 execute_process(COMMAND ${CMAKE_COMMAND} ${OPENCV_CMAKE_ARGS} -S ${OPENCV_DOWNLOAD_DIR}/opencv-${OPENCV_VERSION} -B ${OPENCV_BUILD_DIR})
 message(STATUS "Configuring OpenCV build - done")
