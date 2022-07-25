@@ -41,7 +41,7 @@ jobs:
         run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
 
   build-java-bridge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       CC: clang

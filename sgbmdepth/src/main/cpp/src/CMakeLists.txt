@@ -12,8 +12,8 @@ if (DEFINED SCAPIX_BRIDGE)
     include(FetchContent)
     FetchContent_Declare(
             cmodule
-            URL "https://github.com/scapix-com/cmodule/archive/refs/tags/v1.0.32.tar.gz"  # Build fails with v1.0.33
-            URL_HASH SHA256=e6937c95d73188a5add846b27cd00160fe4f6ea31af33be417d2ab7ac19bd8d2
+            URL "https://github.com/scapix-com/cmodule/archive/refs/tags/v1.0.35.tar.gz"  # Build fails with v1.0.33
+            URL_HASH SHA256=3eeabad538e9e06bc21f4ccafccfa97808b8458044ee32f28a37b81e7ce8d174
     )
     FetchContent_MakeAvailable(cmodule)
 
