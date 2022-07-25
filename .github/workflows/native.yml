@@ -25,7 +25,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-v5
+          key: ${{runner.os}}-native
 
       - name: Prepare OpenCV
         run: cmake -P BuildOpenCV.cmake
@@ -41,7 +41,7 @@ jobs:
         run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
 
   build-java-bridge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Distribution with clang 14 or later is required for Scapix
 
     env:
       CC: clang
@@ -58,7 +58,7 @@ jobs:
           path: |
             ~/.cmodule
             ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-bridge
+          key: ${{runner.os}}-bridge
 
       - name: Prepare OpenCV
         run: cmake -P BuildOpenCV.cmake
@@ -83,7 +83,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-build-cache-v5
+          key: ${{runner.os}}-native
 
       - name: Configure linters
         run: |

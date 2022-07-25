@@ -38,6 +38,10 @@ The project consists of the following directories:
 
 ## Build
 
+**Note**: when building on Windows, you may be required to specify a non-default generator, for
+example, `ninja`, with `-DCMAKE_GENERATOR=<generator name>` in the configuration command, because
+Windows' default generator `nmake` seems to fail.
+
 This project requires [OpenCV](https://github.com/opencv/opencv) 4.5.5 or later. You can either
 manually download and install it, or run `BuildOpenCV.cmake` script that will download and build
 OpenCV for you.
@@ -49,10 +53,6 @@ If you already have OpenCV, you can build this project with CMake:
 cmake .          # Configure the build
 cmake --build .  # Start the build
 ```
-
-*Note*: when building on Windows, you may be required to specify a non-default generator, for
-example, `ninja`, with `-DCMAKE_GENERATOR=<generator name>` in the configuration command, because
-Windows' default generator `nmake` seems to fail.
 
 ### Running OpenCV build script
 
@@ -89,16 +89,19 @@ For example, if you want to build for Android with ABI `armeabi-v7a` and Neon su
 installed in the system, the command to run the script will be something like:
 
 ```shell
-cmake -DCMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" \
-      -DCMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang<extension>" \
-      -DCMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++<extension>" \
-      -DANDROID_ABI=armeabi-v7a \
-      -DANDROID_ARM_NEON=ON \
-      -DADD_ANDROID_ABI_CHECK=ON \
+cmake -D CMAKE_TOOLCHAIN_FILE="<NDK path>/build/cmake/android.toolchain.cmake" \
+      -D CMAKE_C_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang<extension>" \
+      -D CMAKE_CXX_COMPILER="<NDK path>/toolchains/llvm/prebuilt/<platform>/bin/clang++<extension>" \
+      -D ANDROID_ABI=armeabi-v7a \
+      -D ANDROID_ARM_NEON=ON \
+      -D ADD_ANDROID_ABI_CHECK=ON \
       -P BuildOpenCV.cmake
 ```
 
 ### Generating a language interface
+
+**Note**: this requires `clang-14.0.0` or newer to be used for building both OpenCV and the project;
+if you are building for Android, use NDK `r25` or newer.
 
 To generate an interface for Java, Objective-C, Python, and some other languages modify the
 configure command as follows:
@@ -115,7 +118,8 @@ build.
 
 ## Usage examples
 
-Files in `examples` directory demonstrate how to use this project for depth estimation.
+Files in `examples` directory demonstrate how to use this project for depth estimation. Specify
+`-D BUILD_EXAMPLES=ON` to build them.
 
 - `GetDepthExample.cpp` accepts three CLI arguments: path to the file with calibration parameters,
   path to the left image and path to the right image – using them, it estimates depth and prints the

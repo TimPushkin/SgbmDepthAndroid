@@ -48,7 +48,7 @@ jobs:
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
-          ndk-version: r23b
+          ndk-version: r25
           add-to-path: false
 
       - name: Cache native-build-related files
@@ -57,7 +57,7 @@ jobs:
           path: |
             ~/.cmodule
             ${{github.workspace}}/${{env.NATIVE_PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-native-build-cache
+          key: ${{runner.os}}-native
 
       - name: Prepare OpenCV
         env:
