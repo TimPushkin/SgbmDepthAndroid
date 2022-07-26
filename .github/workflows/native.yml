@@ -14,33 +14,6 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: hendrikmuhs/ccache-action@v1.2
-
-      - name: Cache build artifacts
-        uses: actions/cache@v3
-        with:
-          path: ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-native
-
-      - name: Prepare OpenCV
-        run: cmake -P BuildOpenCV.cmake
-
-      - name: Configure CMake
-        run: |
-          cmake -B ${{env.BUILD_SUBDIR}} \
-                -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-                -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
-                -D BUILD_EXAMPLES=ON
-
-      - name: Build
-        run: cmake --build ${{env.BUILD_SUBDIR}} --config ${{env.BUILD_TYPE}}
-
-  build-java-bridge:
     runs-on: ubuntu-22.04  # Distribution with clang 14 or later is required for Scapix
 
     env:
@@ -58,7 +31,7 @@ jobs:
           path: |
             ~/.cmodule
             ${{github.workspace}}/${{env.PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-bridge
+          key: ${{runner.os}}-native
 
       - name: Prepare OpenCV
         run: cmake -P BuildOpenCV.cmake
@@ -67,6 +40,8 @@ jobs:
         run: |
           cmake -B ${{env.BUILD_SUBDIR}} \
                 -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+                -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                -D BUILD_EXAMPLES=ON \
                 -D SCAPIX_BRIDGE=java
 
       - name: Build

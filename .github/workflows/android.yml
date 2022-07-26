@@ -57,7 +57,7 @@ jobs:
           path: |
             ~/.cmodule
             ${{github.workspace}}/${{env.NATIVE_PROJECT_SUBDIR}}/${{env.BUILD_SUBDIR}}
-          key: ${{runner.os}}-native
+          key: ${{runner.os}}-android
 
       - name: Prepare OpenCV
         env:
